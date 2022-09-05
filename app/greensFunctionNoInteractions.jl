@@ -12,9 +12,12 @@ include(abspath(@__DIR__, "../src/observables.jl"))
 include(abspath(@__DIR__, "../src/tools.jl"))
 
 
-lat = Lattice(12, 12, 40)
-lat_analytic = Lattice(lat.Lm, lat.Ln, 40)
-par = Parameters(2.0, 0.0, 1.0, 0.5)
+lat = Lattice(8, 8, 60)
+lat_analytic = Lattice(lat.Lm, lat.Ln, 60)
+# lat_analytic = Lattice(20,20, 100)
+
+
+par = Parameters(6.0, 0.5, 1.0, 0.5)
 int(x) = floor(Int, x)
 particle_x = Particle(1, 1, 0, 1)
 particle_y = Particle(1, 1, 0, 1)
@@ -30,11 +33,11 @@ for i=[1,2]
     for j = [1,2]
         clf()
         if i==j
-            semilogy(τ_analytic, real(correlator[:,i,j]),".", label="analytical")
-            semilogy(τ, real(correlator_M[:,i,j]),".", label="Fermionic Matrix")
+            semilogy(τ_analytic, real.(correlator[:,i,j]), "*", label="analytical")
+            semilogy(τ, real.(correlator_M[:,i,j]),".", label="Fermionic Matrix")
         else 
-            plot(τ_analytic, real(correlator[:,i,j]),".", label="analytical")
-            plot(τ, real(correlator_M[:,i,j]),".", label="Fermionic Matrix")
+            plot(τ_analytic, real.(correlator[:,i,j]), "*", label="analytical")
+            plot(τ, real.(correlator_M[:,i,j]),".", label="Fermionic Matrix")
         end
         legend()
         xlabel(L"time")
@@ -52,11 +55,11 @@ for i=[1,2]
     for j = [1,2]
         clf()
         if i==j
-            semilogy(τ_analytic, real(correlator_momentum[:,i,j]), ".", label="analytical")
-            semilogy(τ, real(correlator_M_momentum[:,i,j]), ".", label="Fermionic")
+            semilogy(τ_analytic, real.(correlator_momentum[:,i,j]), "*", label="analytical")
+            semilogy(τ, real.(correlator_M_momentum[:,i,j]), ".", label="Fermionic")
         else 
-            plot(τ_analytic, real(correlator_momentum[:,i,j]), ".", label="analytical")
-            plot(τ, real(correlator_M_momentum[:,i,j]), ".", label="Fermionic")
+            plot(τ_analytic, real.(correlator_momentum[:,i,j]), "*", label="analytical")
+            plot(τ, real.(correlator_M_momentum[:,i,j]), ".", label="Fermionic")
         end
         legend()
         xlabel(L"time")
@@ -73,10 +76,10 @@ c_plus = C_pm(correlator_momentum,1)
 c_min = C_pm(correlator_momentum,-1)
 
 clf()
-semilogy(τ, real(c_M_plus), ".", label=L"Fermionic G_{+}")
-semilogy(τ_analytic, real(c_plus), ".", label=L"analytical G_{+}")
-semilogy(τ, real(c_M_min), ".", label=L"Fermionic G_{-}")
-semilogy(τ_analytic, real(c_min), ".", label=L"analytical G_{-}")
+semilogy(τ, real.(c_M_plus), ".", label=L"Fermionic G_{+}")
+semilogy(τ_analytic, real.(c_plus), "*", label=L"analytical G_{+}")
+semilogy(τ, real.(c_M_min), ".", label=L"Fermionic G_{-}")
+semilogy(τ_analytic, real.(c_min), "*", label=L"analytical G_{-}")
 legend()
 xlabel(L"time")
 ylabel(L"\langle G(τ,k) \rangle")

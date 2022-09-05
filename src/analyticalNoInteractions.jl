@@ -17,8 +17,8 @@ function greensFunctionGraphene_spatial(x,y,par,lat)
     Eu(x) = cos(x)+im*sin(x)
     Δ(k) = sum([Eu(dot(k,r_O[i,:])) for i=1:3])
     h(k) = [[par.mass,-par.κ*conj(Δ(k))] [-par.κ*Δ(k),-par.mass]]
-    # invG(ω,k) = im*ω*I +h(k)
-    invG(ω,k) = (2/δ)*im*Eu(ω*δ/2)*sin(ω*δ/2)*I +h(k)
+    invG(ω,k) = im*ω*I +h(k)
+    # invG(ω,k) = (2/δ)*im*Eu(ω*δ/2)*sin(ω*δ/2)*I +h(k)
     G(ω,k) = inv(invG(ω,k))
 
     correlator = zeros(ComplexF64,(lat.Nt,2,2))
@@ -62,7 +62,7 @@ function greensFunctionGraphene_kspace(k,par,lat)
     ω(t) = pi*(2t+1)/par.β
     for τ=1:lat.Nt
         for t = -floor(Int,lat.Nt/2):(floor(Int,lat.Nt/2)-1)
-            correlator[τ,:,:] .+=G(ω(t),k).*Eu(ω(t)*(τ-1/2)*(par.β/lat.Nt))
+            correlator[τ,:,:] .+=G(ω(t),k).*Eu(ω(t)*(τ-1)*(par.β/lat.Nt))
         end 
     end 
     

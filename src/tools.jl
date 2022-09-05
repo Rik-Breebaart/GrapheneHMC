@@ -112,3 +112,29 @@ function plot_matrix(A, filename; title=nothing, folder=abspath(@__DIR__,"../plo
     colorbar()
     savefig(abspath(folder,filename*".png"))
 end 
+
+
+"""
+A function to create a meshgrid array of the distances between particles in a 2d space with periodic boundary conditions.
+
+Input: 
+    arrayXY (2xN array of Floats)     The array contianing the x and y coordinates of N particles
+    N       (Int)                     The number of particles
+    Xmax    (Float)                   The maximum x of the square box
+    Ymax    (Float)                   The maximum y of the square box
+
+Output:
+    R  (NxN array of Floats)     Array of the  euclidean distance between the particles on the array given by sqrt(x^2+y^2)
+"""
+function distanceXY(arrayXY, N, Xmax, Ymax)
+    #create distance matrices
+    CoordX = [arrayXY[i,1]-arrayXY[j,1] for i in 1:N, j in 1:N]
+    CoordY = [arrayXY[i,2]-arrayXY[j,2] for i in 1:N, j in 1:N]
+    #ensure periodic boundary conditions are met
+    CoordX[CoordX .> Xmax/2] .-=Xmax
+    CoordX[CoordX .< -Xmax/2] .+=Xmax
+    CoordY[CoordY .> Ymax/2] .-=Ymax
+    CoordY[CoordY .< -Ymax/2] .+=Ymax
+    # Create euclidean distance matrix
+    R = sqrt.(CoordX[:,:].^2 + CoordY[:,:].^2)
+end 
