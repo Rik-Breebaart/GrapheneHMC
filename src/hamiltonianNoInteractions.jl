@@ -21,7 +21,7 @@ Output:
 """
 function HamiltonianMatrix_no_int(par::Parameters, lat::Lattice)
     # positive mass for A sublattice and negative for B sublattice
-    H = kron([1 0; 0 -1],Diagonal(ones(lat.dim_sub)).*par.mass) -par.κ*neighbour_matrix(lat)
+    H = kron([[1, 0] [0, -1]],Diagonal(ones(lat.dim_sub)).*par.mass) -par.κ*neighbour_matrix(lat)
     # H = H_m + H_tb (for single spin)
     return H 
 end 

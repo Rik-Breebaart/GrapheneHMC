@@ -197,7 +197,7 @@ Input:
     lat (Lattice struct)        Struct containing the lattice paramaters
 
 Output:
-    R_Interact   (Lat.dim_sub*2,Lat.dim_sub*2 matrix)    Float matrix returning the distance between all particles with eachother.
+    r   (Lat.dim_sub*2,Lat.dim_sub*2 matrix)    Float matrix returning the distance between all particles with eachother.
 """
 function distance_matrix(lat::Lattice)
     x = position_matrix(lat)
@@ -206,6 +206,6 @@ function distance_matrix(lat::Lattice)
     #ensure periodic boundary conditions are met
     Xmax = findmax(x[:,1])[1]+sqrt(3)/2*lat.a
     Ymax = findmax(x[:,2])[1]+lat.a/2
-    R_Interact = distanceXY(x, dim, Xmax, Ymax)
-    return R_Interact
+    r = distanceXY(x, dim, Xmax, Ymax)
+    return r
 end 

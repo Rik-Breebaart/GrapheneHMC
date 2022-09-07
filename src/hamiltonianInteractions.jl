@@ -1,5 +1,5 @@
 #= 
-This script will contain the interacting fermionic matrices.
+This script will contain the interacting Fermionic matrices.
 =#
 using LinearAlgebra
 include("hexagonalLattice.jl")
@@ -19,8 +19,33 @@ function FermionicMatrix_int_35(ϕ, V, par::Parameters, lat::Lattice)
     # (split as shown below because the A and B sublattice are seperated in the matrix [first all A, then all B])
     M -= kron(Diagonal(ones(2)),kron(P,Diagonal(ones(lat.dim_sub))))
     # determine the hamiltonian corresponding to the problem.
-    H = HamiltonianMatrix_no_int(par,lat) + diagonal(V)
+    H = HamiltonianMatrix_no_int(par,lat) + Diagonal(V[diagind(V)])./2
     # performe permuted (δ_{t-1,t'}) on the array ensureing that the spatial part is correct
-    M += δ*Array_Permute_Time_t1_t(H,lat)
+    M += δ*Array_Permute_Time_t1_t(H,lat) + im*ϕ.*kron(Diagonal(ones(2).*δ),kron(P,Diagonal(ones(lat.dim_sub))))
     return M
 end 
+
+function FermionicMatrix_int_35_saved_part(V, par::Parameters, lat::Lattice)
+    # determine the temporal spacing
+    δ=par.β/lat.Nt
+    #create the permuation matrix for δ_{t-1,t'}
+    P = time_permutation_Matrix_anti_pbc(lat)
+    # set the diagonal for (δ_{x,y}δ_{t,t'})
+    M = Diagonal(ones(lat.D))
+    # set the permutated of diagonal for (δ_{x,y}δ_{t-1,t'}) 
+    # (split as shown below because the A and B sublattice are seperated in the matrix [first all A, then all B])
+    M -= kron(Diagonal(ones(2)),kron(P,Diagonal(ones(lat.dim_sub))))
+    # determine the hamiltonian corresponding to the problem.
+    H = HamiltonianMatrix_no_int(par,lat) + Diagonal(V[diagind(V)])./2
+    # performe permuted (δ_{t-1,t'}) on the array ensureing that the spatial part is correct
+    M += δ*Array_Permute_Time_t1_t(H,lat) 
+    return M
+end 
+
+function Fast_FermionicMatrix_int_35_phi_part(ϕ, M_saved_part, par::Parameters, lat::Lattice)
+    # determine the temporal spacing
+    δ=par.β/lat.Nt
+    #create the permuation matrix for δ_{t-1,t'}
+    P = time_permutation_Matrix_anti_pbc(lat)
+    return M_saved_part + im*ϕ.*kron(Diagonal(ones(2).*δ),kron(P,Diagonal(ones(lat.dim_sub))))
+end
