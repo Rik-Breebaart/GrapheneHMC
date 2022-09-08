@@ -6,8 +6,6 @@ include("hexagonalLattice.jl")
 include("tools.jl")
 include("hamiltonianNoInteractions.jl")
 
-
-
 function FermionicMatrix_int_35(ϕ, V, par::Parameters, lat::Lattice)
     # determine the temporal spacing
     δ=par.β/lat.Nt
@@ -49,3 +47,4 @@ function Fast_FermionicMatrix_int_35_phi_part(ϕ, M_saved_part, par::Parameters,
     P = time_permutation_Matrix_anti_pbc(lat)
     return M_saved_part + im*ϕ.*kron(Diagonal(ones(2).*δ),kron(P,Diagonal(ones(lat.dim_sub))))
 end
+

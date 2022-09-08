@@ -4,7 +4,7 @@
 
 =#
 
-using LinearAlgebra
+using LinearAlgebra, IterativeSolvers
 include("hexagonalLattice.jl")
 include("tools.jl")
 
@@ -42,6 +42,3 @@ function FermionicMatrix_no_int(par::Parameters,lat::Lattice)
     M += δ*Array_Permute_Time_t1_t(H,lat)
     return M
 end 
-
-
-
