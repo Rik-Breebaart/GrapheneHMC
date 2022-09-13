@@ -56,7 +56,7 @@ function LeapFrogQPQ(path_len, step_size, p_0, q_0, dpdt, dqdt)
     # the input are the initial coordinates p0 and q0 and the functions dpdt and dqdt for the derivatives of the LeapFrog
     
     #perform LeapFrog for N=path_len/step_size steps
-    steps = path_len/step_size
+    steps = Integer(ceil(path_len/step_size))
     
     p = p_0
     q = q_0
@@ -69,4 +69,50 @@ function LeapFrogQPQ(path_len, step_size, p_0, q_0, dpdt, dqdt)
     p += step_size*dpdt(q)
     q += step_size*dqdt(p)/2
     return p, q
+end
+
+function LeapFrogPQP_plot(path_len, step_size, p_0, q_0, dpdt, dqdt)
+    # the input are the initial coordinates array p0 and q0 and the functions dpdt and dqdt for the derivatives of the LeapFrog
+    
+    #perform LeapFrog for N=path_len/step_size steps
+    steps = Integer(ceil(path_len/step_size))
+    p = zeros((steps,size(p_0)))
+    q = zeros((steps,size(q_0)))
+    p[1,:] = p_0
+    q[1,:] = q_0
+    #using PQP scheme
+    p[] .+= step_size.*dpdt.(q)/2 
+    for s = 1:steps
+        q .+= step_size.*dqdt.(p)
+        p .+= step_size.*dpdt.(q)
+    end
+    q .+= step_size.*dqdt.(p)
+    p .+= step_size.*dpdt.(q)/2 
+    return p, q
+end
+
+function LeapFrogQPQ_store(path_len, step_size, p, q, dqdt, pot)
+    # the input are the initial coordinates p0 and q0 and the functions dpdt and dqdt for the derivatives of the LeapFrog
+    
+    # perform LeapFrog for N=path_len/step_size steps
+    steps = Integer(ceil(path_len/step_size))
+
+    H = zeros(ComplexF64,(steps))
+    K = zeros(ComplexF64,(steps))
+    U = zeros(ComplexF64,(steps))
+    #using QPQ scheme
+    K[1] = 0.5*sum(q.*q)
+    U[1]= pot(p)
+    H[1] = K[1]+ U[1]
+    a = dqdt(p) 
+    for s = 2:steps
+        q += step_size*a/2 
+        p += step_size*q
+        a = dqdt(p) 
+        q += step_size*a/2
+        K[s] = 0.5*sum(q.*q)
+        U[s]= pot(p)
+        H[s] = K[s]+ U[s]
+    end
+    return p, q, H, K, U
 end

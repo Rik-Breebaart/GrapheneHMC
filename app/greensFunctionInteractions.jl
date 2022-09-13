@@ -12,7 +12,7 @@ include(abspath(@__DIR__, "../src/observables.jl"))
 include(abspath(@__DIR__, "../src/tools.jl"))
 
 
-lat = Lattice(6, 12, 60)
+lat = Lattice(6, 6, 20)
 lat_analytic = Lattice(lat.Lm, lat.Ln, 60)
 # lat_analytic = Lattice(20,20, 100)
 
@@ -21,6 +21,9 @@ par = Parameters(4.0, 0.0, 1.0, 0.5)
 int(x) = floor(Int, x)
 particle_x = Particle(1, 1, 0, 1)
 particle_y = Particle(1, 1, 0, 1)
+
+@show particle_position(particle_x, lat)
+@show particle_position(particle_y.m, particle_y.n, 1 , lat, start =1)
 
 # correlator = greensFunctionGraphene_spatial(particle_x,particle_y, par, lat_analytic)
 # M_no_int = FermionicMatrix_no_int(par, lat)

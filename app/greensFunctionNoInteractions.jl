@@ -12,12 +12,12 @@ include(abspath(@__DIR__, "../src/observables.jl"))
 include(abspath(@__DIR__, "../src/tools.jl"))
 
 
-lat = Lattice(6, 12, 60)
-lat_analytic = Lattice(lat.Lm, lat.Ln, 60)
+lat = Lattice(6, 6, 40)
+lat_analytic = Lattice(lat.Lm, lat.Ln, 40)
 # lat_analytic = Lattice(20,20, 100)
 
 
-par = Parameters(4.0, 0.0, 1.0, 0.5)
+par = Parameters(2.0, 0.0, 1.0, 0.5)
 int(x) = floor(Int, x)
 particle_x = Particle(1, 1, 0, 1)
 particle_y = Particle(1, 1, 0, 1)
@@ -68,7 +68,7 @@ for i=[1,2]
     end 
 end
 
-C_pm(correlator,q) = (correlator[:,1,1]+correlator[:,2,2]+q*(correlator[:,1,2]+correlator[:,2,1]))./2
+C_pm(correlator,q) = (correlator[:,1,1]+correlator[:,2,2]+q.*(correlator[:,1,2]+correlator[:,2,1]))./2
 
 c_M_plus = C_pm(correlator_M_momentum,1)
 c_M_min = C_pm(correlator_M_momentum,-1)

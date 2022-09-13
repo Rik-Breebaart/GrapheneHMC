@@ -64,8 +64,8 @@ function Array_Equal_Time(array, lat::Lattice)
     indB = lat.dim_sub+1:2*lat.dim_sub
     I = Diagonal(ones(lat.Nt))
     AA = kron(I, array[indA, indA])
-    BB = kron(I, array[indA, indB])
-    AB = kron(I, array[indB, indB])
+    AB = kron(I, array[indA, indB])
+    BB = kron(I, array[indB, indB])
     BA = kron(I, array[indB, indA])
     return [AA AB; BA BB]
 end

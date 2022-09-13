@@ -21,7 +21,8 @@ function greensFunctionGraphene_spatial(particle_x::Particle, particle_y::Partic
     Δ(k) = sum([Eu(dot(k,r_O[i,:])) for i=1:3])
     h(k) = [[par.mass,-par.κ*conj(Δ(k))] [-par.κ*Δ(k),-par.mass]]
     # invG(ω,k) = im*ω*I +h(k)
-    invG(ω,k) = (2/δ)*im*Eu(ω*δ/2)*sin(ω*δ/2)*I +h(k)
+    invG(ω,k) = (2/δ)*im*Eu(-ω*δ/2)*sin(ω*δ/2)*I +h(k)
+    # invG(ω,k) = (2/δ)*im*Eu(ω*δ/2)*sin(ω*δ/2)*I +h(k)
     # invG(ω,k) = [[(2/δ)*im*Eu(ω*δ/2)*sin(ω*δ/2), 0] [0, (2/δ)*im*Eu(-ω*δ/2)*sin(ω*δ/2)]] +h(k)
 
 
@@ -35,10 +36,10 @@ function greensFunctionGraphene_spatial(particle_x::Particle, particle_y::Partic
     for τ=1:lat.Nt
         for m=1:lat.Lm, n=1:lat.Ln
             for Pab_x = [0,1], Pab_y =[0,1]
-                q[Pab_x+1,Pab_y+1] = Eu(dot(ks(m,n),(y(Pab_x)-x(Pab_y))))
+                q[Pab_x+1,Pab_y+1] = Eu(dot(ks(m,n),(x(Pab_x)-y(Pab_y))))
             end 
             for t = -floor(Int,lat.Nt/2):(floor(Int,lat.Nt/2)-1)
-                correlator[τ,:,:] .+=G(ω(t),ks(m,n))*q.*Eu(ω(t)*(τ-1)*δ)
+                correlator[τ,:,:] .+=G(ω(t),ks(m,n)).*q.*Eu(ω(t)*(τ-1)*δ)
             end 
         end 
     end 
@@ -67,7 +68,8 @@ function greensFunctionGraphene_kspace(k,par,lat)
     Δ(k) = sum([Eu(dot(k,r_O[i,:])) for i=1:3])
     h(k) = [[par.mass,-par.κ*conj(Δ(k))] [-par.κ*Δ(k),-par.mass]]
     # invG(ω,k) = im*ω*I +h(k)
-    invG(ω,k) = (2/δ)*im*Eu(ω*δ/2)*sin(ω*δ/2)*I +h(k)
+    invG(ω,k) = (2/δ)*im*Eu(-ω*δ/2)*sin(ω*δ/2)*I +h(k)
+    # invG(ω,k) = (2/δ)*im*Eu(ω*δ/2)*sin(ω*δ/2)*I +h(k)
     # invG(ω,k) = [[(2/δ)*im*Eu(ω*δ/2)*sin(ω*δ/2), 0] [0, (2/δ)*im*Eu(-ω*δ/2)*sin(ω*δ/2)]] +h(k)
     
 

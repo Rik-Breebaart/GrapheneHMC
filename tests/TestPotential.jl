@@ -35,9 +35,28 @@ function Test_potentialPlot(par::Parameters, lat::Lattice)
     savefig(abspath(folder,"potentials.png"))
 end 
 
+function Test_potentialSymmetry(par::Parameters, lat::Lattice)
+    folder=abspath(@__DIR__,"../plots")
+    r = distance_matrix(lat)
+    V_c = coulomb_potential(par, lat)
+    V_p = partialScreenedCoulomb_potential(par, lat)
+    V_s = shortScreenedCoulomb_potential(par, lat)
+    @test V_c == transpose(V_c)
+    @test V_p == transpose(V_p)
+    @test V_s == transpose(V_s)
+    invV_c = inv(V_c)
+    invV_p = inv(V_p)
+    invV_s = inv(V_s)
+    @test isapprox(invV_c, transpose(invV_c))
+    @test isapprox(invV_p, transpose(invV_p))
+    @test isapprox(invV_s, transpose(invV_s))
+
+end
+
 
 par = Parameters(4.0, 0.0, 1.0, 0.5)
-lat = Lattice(4, 4, 20)
+lat = Lattice(6, 6, 10)
 
 Test_potentialPlotMatrix(par, lat)
 Test_potentialPlot(par, lat)
+Test_potentialSymmetry(par, lat)

@@ -25,6 +25,7 @@ function Test_HybirdMonteCarlo()
     @test isapprox(std(res),1.0,atol=0.05)
 end 
 
+
 function Test_MetropolisHastingsMonteCarlo()
         # Gaussian integral
         S(x) = sum(x.^2/2)
