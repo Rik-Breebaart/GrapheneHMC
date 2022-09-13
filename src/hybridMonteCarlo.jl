@@ -134,7 +134,7 @@ function HybridMonteCarlo(S::Function, ∇S::Function, M_function::Function, D::
         #step 2B: perform the molecular dynamics using the prescribed integrator
         ϕ_trial, π = LeapFrogQPQ(path_length, step_size, ϕ, π, dpdt, dqdt)
         #step 2C: compute the final hamiltonian energy
-        H_final = 0.5*sum(π.^2) + S(ϕ_trail, χ)
+        H_final = 0.5*sum(π.^2) + S(ϕ_trial, χ)
 
         #step 3A: compute the energy difference for Metropolis-Hastings check
         ΔH = H_final-H_init
