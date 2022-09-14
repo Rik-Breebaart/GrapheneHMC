@@ -12,8 +12,8 @@ include(abspath(@__DIR__, "../src/observables.jl"))
 include(abspath(@__DIR__, "../src/tools.jl"))
 
 
-lat = Lattice(12, 12, 60)
-lat_analytic = Lattice(lat.Lm, lat.Ln, 60)
+lat = Lattice(6, 6, 40)
+lat_analytic = Lattice(lat.Lm, lat.Ln, 40)
 # lat_analytic = Lattice(20,20, 100)
 
 
