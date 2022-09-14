@@ -42,7 +42,7 @@ function HybridMonteCarlo(S::Function, ∇S::Function, D::Integer, path_length, 
         else
             position = position_trial
             if print_accept==true
-                println("Accepted ",i)
+                println("Accepted ",i-nreject)
             end
         end
         configurations[i,:] .= position
