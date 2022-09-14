@@ -1,7 +1,7 @@
 #= 
 This file contains the tests for the HybridMonteCarlo implementation
 =#
-using PyPlot
+using PyPlot, Test
 include(abspath(@__DIR__,"../src/hybridMonteCarlo.jl"))
 include(abspath(@__DIR__,"../src/integrators.jl"))
 
