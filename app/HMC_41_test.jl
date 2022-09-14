@@ -14,9 +14,9 @@ include(abspath(@__DIR__, "../src/observables.jl"))
 include(abspath(@__DIR__, "../src/tools.jl"))
 
 
-lat = Lattice(2, 2, 20)
-lat_analytic = Lattice(lat.Lm, lat.Ln, 20)
-par = Parameters(2.0, 0.0, 40.0, 0.5)
+lat = Lattice(6, 6, 40)
+lat_analytic = Lattice(lat.Lm, lat.Ln, 40)
+par = Parameters(2.0, 0.0, 250.0, 0.5)
 
 particle_x = Particle(1, 1, 0, 1)
 particle_y = Particle(1, 1, 0, 1)
@@ -28,7 +28,7 @@ k_b = (4*pi)/(3*lat.a)* [0,1]
 ks(m,n) = m/lat.Lm*k_a + n/lat.Ln * k_b
 correlator_momentum = greensFunctionGraphene_kspace(ks(1,1), par, lat_analytic)
 
-#we will look at equation 41
+#we will look at equation 35
 V = coulomb_potential(par, lat)
 M_function(ϕ) = FermionicMatrix_int_41(ϕ, par, lat)
 
@@ -37,7 +37,7 @@ S(ϕ, χ) = Action_V_cg(ϕ, V, par ,lat) + Action_M_cg(χ, M_function(ϕ), par ,
 ∇S(ϕ, χ) = ∇S_V_cg(ϕ, V, par, lat)+∇S_M_eq41_cg(ϕ, χ, M_function(ϕ), par, lat)
 D = lat.D
 path_length = 10.0
-step_size = 0.3
+step_size = 0.1
 Nsamples= 100
 configurations, nreject = HybridMonteCarlo(S::Function, ∇S::Function, M_function::Function, D::Integer, path_length, step_size, Nsamples::Integer; rng=rng)
 @show (Nsamples-nreject)/Nsamples
@@ -64,7 +64,7 @@ for i=[1,2]
         legend()
         xlabel(L"time")
         ylabel(L"\langle G(τ,x,y) \rangle")
-        savefig(string("/home/rikbre/GrapheneHMC/plots/HMC_41_G",name[i],name[j]))
+        savefig(abspath(@__DIR__, string("../plots/HMC_41_G",name[i],name[j])))
     end 
 end
 
@@ -83,6 +83,6 @@ for i=[1,2]
         legend()
         xlabel(L"time")
         ylabel(L"\langle G(τ,k) \rangle")
-        savefig(string("/home/rikbre/GrapheneHMC/plots/HMC_41_G_k",name[i],name[j]))
+        savefig(abspath(@__DIR__, string("../plots/HMC_41_G_k",name[i],name[j])))
     end 
 end
