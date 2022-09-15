@@ -11,8 +11,9 @@ include(abspath(@__DIR__, "../src/hamiltonianNoInteractions.jl"))
 include(abspath(@__DIR__, "../src/observables.jl"))
 include(abspath(@__DIR__, "../src/tools.jl"))
 
-lat = Lattice(18, 18, 64)
-lat_analytic = Lattice(lat.Lm, lat.Ln, 64)
+
+lat = Lattice(6, 6, 40)
+lat_analytic = Lattice(lat.Lm, lat.Ln, 40)
 # lat_analytic = Lattice(20,20, 100)
 
 

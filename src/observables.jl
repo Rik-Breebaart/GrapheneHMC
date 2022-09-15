@@ -43,3 +43,12 @@ function greens_function_kspace(M, k, par::Parameters, lat::Lattice)
     end 
     return correlator./(lat.dim_sub)^2
 end 
+
+function Δn(M, par::Parameters, lat::Lattice)
+    P = time_permutation_Matrix_pbc(lat)
+    # δ_{t-1, t'}δ_{x,y}m_x 
+    # with m_x = 1 if x in A and -1 if x in B.
+    S_P = kron(Diagonal([1,-1]),kron(P,Diagonal(ones(lat.dim_sub))))
+    invM = S_P*inv(M)
+    return (-2/(lat.Nt*lat.dim_sub))*tr(invM)
+end
