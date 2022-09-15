@@ -64,7 +64,7 @@ for i=[1,2]
         legend()
         xlabel(L"time")
         ylabel(L"\langle G(τ,x,y) \rangle")
-        savefig(abspath(@__DIR__, string("../plots/HMC_G",name[i],name[j])))
+        savefig(abspath(@__DIR__, string("../plots/HMC_35_G",name[i],name[j])))
     end 
 end
 
@@ -83,6 +83,6 @@ for i=[1,2]
         legend()
         xlabel(L"time")
         ylabel(L"\langle G(τ,k) \rangle")
-        savefig(abspath(@__DIR__, string("../plots/HMC_G_k",name[i],name[j])))
+        savefig(abspath(@__DIR__, string("../plots/HMC_35_G_k",name[i],name[j])))
     end 
 end
