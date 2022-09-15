@@ -11,9 +11,8 @@ include(abspath(@__DIR__, "../src/hamiltonianNoInteractions.jl"))
 include(abspath(@__DIR__, "../src/observables.jl"))
 include(abspath(@__DIR__, "../src/tools.jl"))
 
-
-lat = Lattice(12, 12, 60)
-lat_analytic = Lattice(lat.Lm, lat.Ln, 60)
+lat = Lattice(18, 18, 64)
+lat_analytic = Lattice(lat.Lm, lat.Ln, 64)
 # lat_analytic = Lattice(20,20, 100)
 
 
@@ -42,7 +41,7 @@ for i=[1,2]
         legend()
         xlabel(L"time")
         ylabel(L"\langle G(τ,x,y) \rangle")
-        savefig(string("/home/rikbre/GrapheneHMC/plots/G",name[i],name[j]))
+        savefig(abspath(@__DIR__, string("../plots/G",name[i],name[j])))
     end 
 end
 
@@ -64,7 +63,7 @@ for i=[1,2]
         legend()
         xlabel(L"time")
         ylabel(L"\langle G(τ,k) \rangle")
-        savefig(string("/home/rikbre/GrapheneHMC/plots/G_k",name[i],name[j]))
+        savefig(abspath(@__DIR__, string("../plots/G_k",name[i],name[j])))
     end 
 end
 
@@ -83,4 +82,4 @@ semilogy(τ_analytic, real.(c_min), "*", label=L"analytical G_{-}")
 legend()
 xlabel(L"time")
 ylabel(L"\langle G(τ,k) \rangle")
-savefig("/home/rikbre/GrapheneHMC/plots/G_plusMinus_k")
+savefig(abspath(@__DIR__, "../plots/G_plusMinus_k"))
