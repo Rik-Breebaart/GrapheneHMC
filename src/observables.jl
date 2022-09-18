@@ -32,7 +32,7 @@ function greens_function_kspace(M, k, par::Parameters, lat::Lattice)
                     int_y_0 = index(m_y, n_y, 1, Pab_y, lat, start = 1)
                     x = particle_position(m_x, n_x, Pab_x, lat, start=1)
                     y = particle_position(m_y, n_y, Pab_y, lat, start=1)
-                    q = Eu(dot(k,(x-y)))
+                    q = Eu(-dot(k,(x-y)))
                     for τ=1:lat.Nt
                         int_x_τ = index(m_x, n_x, τ, Pab_x, lat, start = 1)
                         correlator[τ, Pab_x+1, Pab_y+1] += M_inv[int_x_τ, int_y_0]*q
@@ -41,7 +41,7 @@ function greens_function_kspace(M, k, par::Parameters, lat::Lattice)
             end
         end 
     end 
-    return correlator./(lat.dim_sub)^2
+    return correlator./(lat.dim_sub)
 end 
 
 function Δn(M, par::Parameters, lat::Lattice)
@@ -50,5 +50,5 @@ function Δn(M, par::Parameters, lat::Lattice)
     # with m_x = 1 if x in A and -1 if x in B.
     S_P = kron(Diagonal([1,-1]),kron(P,Diagonal(ones(lat.dim_sub))))
     invM = S_P*inv(M)
-    return (-2/(lat.Nt*lat.dim_sub))*tr(invM)
+    return (2/(lat.Nt*lat.dim_sub))*sum(diag(invM)[2:lat.D])
 end
