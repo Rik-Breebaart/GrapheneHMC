@@ -50,5 +50,20 @@ function Δn(M, par::Parameters, lat::Lattice)
     # with m_x = 1 if x in A and -1 if x in B.
     S_P = kron(Diagonal([1,-1]),kron(P,Diagonal(ones(lat.dim_sub))))
     invM = S_P*inv(M)
-    return (2/(lat.Nt*lat.dim_sub))*real(sum(diag(invM)[2:lat.D]))
+    return (2/(lat.Nt*lat.dim_sub))*real(sum(diag(invM)))
+end
+
+function Δn_time(M, par::Parameters, lat::Lattice)
+    M_inv = inv(M)
+    correlator = zeros(ComplexF64, (lat.Nt,2,2))
+    for Pab_x=[0,1]
+        for Pab_y = [0,1]
+            int_y_0 = index(1, 1, 1, Pab_y, lat, start = 1)
+            for τ=1:lat.Nt
+                int_x_τ = index(1, 1, τ, Pab_x, lat, start = 1)
+                correlator[τ, Pab_x+1, Pab_y+1] = M_inv[int_x_τ, int_y_0]
+            end
+        end 
+    end 
+    return 2*(correlator[:,1,1]-correlator[:,2,2])
 end
