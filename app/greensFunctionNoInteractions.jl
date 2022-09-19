@@ -12,12 +12,11 @@ include(abspath(@__DIR__, "../src/observables.jl"))
 include(abspath(@__DIR__, "../src/tools.jl"))
 
 
-lat = Lattice(6, 6, 40)
-lat_analytic = Lattice(lat.Lm, lat.Ln, 40)
-# lat_analytic = Lattice(20,20, 100)
+lat = Lattice(6, 6, 24)
+lat_analytic = Lattice(lat.Lm, lat.Ln, 24)
 
 
-par = Parameters(2.0, 0.0, 1.0, 0.5)
+par = Parameters(2.0, 5.0, 1.0, 0.5)
 int(x) = floor(Int, x)
 particle_x = Particle(1, 1, 0, 1)
 particle_y = Particle(1, 1, 0, 1)
@@ -45,6 +44,13 @@ for i=[1,2]
         savefig(abspath(@__DIR__, string("../plots/G",name[i],name[j])))
     end 
 end
+check = zeros((2,2))
+for i=[1,2], j = [1,2]
+    check[i,j] = mean(real.(correlator[:,i,j])./real.(correlator_M[:,i,j]))
+end
+@show check
+
+
 
 k_a = (2*pi)/(3*lat.a)* [sqrt(3),-1]
 k_b = (4*pi)/(3*lat.a)* [0,1]
@@ -67,6 +73,14 @@ for i=[1,2]
         savefig(abspath(@__DIR__, string("../plots/G_k",name[i],name[j])))
     end 
 end
+
+check = zeros((2,2))
+for i=[1,2], j = [1,2]
+    check[i,j] = mean(real.(correlator_momentum[:,i,j])./real.(correlator_M_momentum[:,i,j]))
+end
+@show check
+
+
 
 C_pm(correlator,q) = (correlator[:,1,1]+correlator[:,2,2]+q.*(correlator[:,1,2]+correlator[:,2,1]))./2
 
