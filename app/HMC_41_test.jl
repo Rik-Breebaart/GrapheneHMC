@@ -14,9 +14,15 @@ include(abspath(@__DIR__, "../src/observables.jl"))
 include(abspath(@__DIR__, "../src/tools.jl"))
 
 
+<<<<<<< HEAD
 lat = Lattice(6, 6, 20)
 lat_analytic = Lattice(lat.Lm, lat.Ln, 20)
 par = Parameters(2.0, 0.5, 1.0, 0.5)
+=======
+lat = Lattice(4, 4, 12)
+lat_analytic = Lattice(lat.Lm, lat.Ln, 12)
+par = Parameters(2.0, 0.5, 250.0, 0.5)
+>>>>>>> 0c58d13898cd32c16f456f8c741defdab70ad59f
 
 particle_x = Particle(1, 1, 0, 1)
 particle_y = Particle(1, 1, 0, 1)
@@ -41,7 +47,11 @@ S(ϕ, χ) = Action_V_cg(ϕ, V, par ,lat) + Action_M_cg(χ, M_function(ϕ), par ,
 D = lat.D
 path_length = 10.0
 step_size = 0.25
+<<<<<<< HEAD
 Nsamples= 10
+=======
+Nsamples= 100
+>>>>>>> 0c58d13898cd32c16f456f8c741defdab70ad59f
 configurations, nreject = HybridMonteCarlo(S::Function, ∇S::Function, M_function::Function, D::Integer, path_length, step_size, Nsamples::Integer; rng=rng)
 @show (Nsamples-nreject)/Nsamples
 
