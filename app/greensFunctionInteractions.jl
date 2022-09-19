@@ -48,9 +48,6 @@ configurations, nreject = HybridMonteCarlo(S::Function, ∇S::Function, M_functi
 
 res_spatial = [greens_function_spatial(M_function(configurations[i,:]), particle_x, particle_y, par, lat) for i in 1:Nsamples]
 res_momentum = [greens_function_kspace(M_function(configurations[i,:]), ks(1,1), par, lat) for i in 1:Nsamples]
-res_Δn = [Δn(M_function(configurations[i,:]), par, lat) for i in ofset:Nsamples]
-Δn_M = mean(res_Δn)
-σ_Δn_M = std(res_Δn)
 
 correlator_M = mean(res_spatial)
 σ_Δn_M = std(res_spatial)
@@ -59,7 +56,6 @@ correlator_M_momentum = mean(res_momentum)
 σ_Δn_M = std(res_momentum)
 
 name = ["A","B"]
-@show Δn_analytical, Δn_M
 
 τ = (0:1:lat.Nt-1).*(par.β/lat.Nt)
 τ_analytic = (0:1:lat_analytic.Nt-1).*(par.β/lat_analytic.Nt)
