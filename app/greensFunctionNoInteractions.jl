@@ -12,11 +12,19 @@ include(abspath(@__DIR__, "../src/observables.jl"))
 include(abspath(@__DIR__, "../src/tools.jl"))
 
 
+<<<<<<< HEAD
+lat = Lattice(16, 16, 64)
+lat_analytic = Lattice(lat.Lm, lat.Ln, 64)
+
+
+par = Parameters(2.0, 0.5, 1.0, 0.5)
+=======
 lat = Lattice(6, 6, 24)
 lat_analytic = Lattice(lat.Lm, lat.Ln, 24)
 
 
 par = Parameters(2.0, 5.0, 1.0, 0.5)
+>>>>>>> 0c58d13898cd32c16f456f8c741defdab70ad59f
 int(x) = floor(Int, x)
 particle_x = Particle(1, 1, 0, 1)
 particle_y = Particle(1, 1, 0, 1)
@@ -41,7 +49,7 @@ for i=[1,2]
         legend()
         xlabel(L"time")
         ylabel(L"\langle G(τ,x,y) \rangle")
-        savefig(string("/home/rikbre/GrapheneHMC/plots/G",name[i],name[j]))
+        savefig(abspath(@__DIR__, string("../plots/G",name[i],name[j])))
     end 
 end
 check = zeros((2,2))
@@ -70,7 +78,7 @@ for i=[1,2]
         legend()
         xlabel(L"time")
         ylabel(L"\langle G(τ,k) \rangle")
-        savefig(string("/home/rikbre/GrapheneHMC/plots/G_k",name[i],name[j]))
+        savefig(abspath(@__DIR__, string("../plots/G_k",name[i],name[j])))
     end 
 end
 
@@ -97,4 +105,4 @@ semilogy(τ_analytic, real.(c_min), "*", label=L"analytical G_{-}")
 legend()
 xlabel(L"time")
 ylabel(L"\langle G(τ,k) \rangle")
-savefig("/home/rikbre/GrapheneHMC/plots/G_plusMinus_k")
+savefig(abspath(@__DIR__, "../plots/G_plusMinus_k"))

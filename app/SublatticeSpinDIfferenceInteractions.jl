@@ -12,11 +12,7 @@ include(abspath(@__DIR__, "../src/observables.jl"))
 include(abspath(@__DIR__, "../src/tools.jl"))
 
 
-<<<<<<< HEAD
 lat = Lattice(16, 16, 64)
-=======
-lat = Lattice(4, 4, 12)
->>>>>>> 0c58d13898cd32c16f456f8c741defdab70ad59f
 # ms = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0]
 ms = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5]
 
@@ -39,7 +35,6 @@ xlabel("m")
 ylabel("Δn")
 savefig(abspath(@__DIR__,"../plots/SublatticeSpin_no_int.png"))
 
-<<<<<<< HEAD
 Δn_array = zeros((length(ms)[1],lat.Nt))
 Δn_analytical = zeros((length(ms)[1],lat.Nt))
 for i in 1:length(ms)[1]
@@ -60,25 +55,3 @@ for i in 1:length(ms)[1]
     ylabel("Δn")
     savefig(abspath(@__DIR__,"../plots/SublatticeSpin_no_int_time_$i.png"))
 end
-=======
-# Δn_array = zeros((length(ms)[1],lat.Nt))
-# Δn_analytical = zeros((length(ms)[1],lat.Nt))
-# for i in 1:length(ms)[1]
-#     par = Parameters(par_0.β, ms[i], 1.0, 0.5)
-#     M_no_int = FermionicMatrix_no_int(par, lat)
-#     Δn_analytical[i,:] = real.(Δn_no_int_time(par, lat))
-#     Δn_array[i,:] = Δn_time(M_no_int, par, lat)
-# end
-
-# τ = (0:1:lat.Nt-1).*(par_0.β/lat.Nt)
-# for i in 1:length(ms)[1]
-#     clf()
-#     plot(τ, Δn_analytical[i,:], "*", label=string("analytical m = ",ms[i]))
-#     plot(τ, Δn_array[i,:], ".", label=string("M: m = ",ms[i]))
-#     legend()
-#     title(L"$\Delta n$ no interactions")
-#     xlabel("τ")
-#     ylabel("Δn")
-#     savefig(abspath(@__DIR__,"../plots/SublatticeSpin_no_int_time_$i.png"))
-# end
->>>>>>> 0c58d13898cd32c16f456f8c741defdab70ad59f
