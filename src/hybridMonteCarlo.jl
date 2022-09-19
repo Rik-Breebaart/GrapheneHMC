@@ -145,7 +145,7 @@ function HybridMonteCarlo(S::Function, ∇S::Function, M_function::Function, D::
         else
             ϕ = ϕ_trial
             if print_accept==true
-                println("Accepted ",i)
+                println("Accepted ",i-nreject)
             end
         end
         configurations[i,:] .= ϕ

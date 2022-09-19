@@ -14,9 +14,9 @@ include(abspath(@__DIR__, "../src/observables.jl"))
 include(abspath(@__DIR__, "../src/tools.jl"))
 
 
-lat = Lattice(6, 6, 40)
-lat_analytic = Lattice(lat.Lm, lat.Ln, 40)
-par = Parameters(2.0, 0.0, 250.0, 0.5)
+lat = Lattice(4, 4, 16)
+lat_analytic = Lattice(lat.Lm, lat.Ln, 16)
+par = Parameters(2.0, 0.5, 250.0, 0.5)
 
 particle_x = Particle(1, 1, 0, 1)
 particle_y = Particle(1, 1, 0, 1)
@@ -27,27 +27,33 @@ k_a = (2*pi)/(3*lat.a)* [sqrt(3),-1]
 k_b = (4*pi)/(3*lat.a)* [0,1]
 ks(m,n) = m/lat.Lm*k_a + n/lat.Ln * k_b
 correlator_momentum = greensFunctionGraphene_kspace(ks(1,1), par, lat_analytic)
+Δn_analytical = Δn_no_int(par, lat)
 
 #we will look at equation 35
 V = coulomb_potential(par, lat)
-M_function(ϕ) = FermionicMatrix_int_35(ϕ, V, par, lat)
+M_part = FermionicMatrix_int_35_saved_part(V, par, lat)
+M_function(ϕ) = FermionicMatrix_int_35_phi_part(ϕ, M_part, par, lat)
+# M_function(ϕ) = FermionicMatrix_int_35(ϕ, V, par, lat)
 
 rng = MersenneTwister(123)
 S(ϕ, χ) = Action_V_cg(ϕ, V, par ,lat) + Action_M_cg(χ, M_function(ϕ), par ,lat)
 ∇S(ϕ, χ) = ∇S_V_cg(ϕ, V, par, lat)+∇S_M_eq35_cg(ϕ, χ, M_function(ϕ), par, lat)
 D = lat.D
 path_length = 10.0
-step_size = 0.3
+step_size = 0.25
 Nsamples= 100
 configurations, nreject = HybridMonteCarlo(S::Function, ∇S::Function, M_function::Function, D::Integer, path_length, step_size, Nsamples::Integer; rng=rng)
 @show (Nsamples-nreject)/Nsamples
 
 res_spatial = [greens_function_spatial(M_function(configurations[i,:]), particle_x, particle_y, par, lat) for i in 1:Nsamples]
 res_momentum = [greens_function_kspace(M_function(configurations[i,:]), ks(1,1), par, lat) for i in 1:Nsamples]
+res_Δn = [Δn(M_function(configurations[i,:]), par, lat) for i in 1:Nsamples]
+Δn_M = mean(res_Δn)
 correlator_M = mean(res_spatial)
 correlator_M_momentum = mean(res_momentum)
 
 name = ["A","B"]
+@show Δn_analytical, Δn_M
 
 τ = (0:1:lat.Nt-1).*(par.β/lat.Nt)
 τ_analytic = (0:1:lat_analytic.Nt-1).*(par.β/lat_analytic.Nt)
