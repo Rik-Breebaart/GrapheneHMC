@@ -1,5 +1,5 @@
 #=This script will contain al the general tools needed for the simulations=#
-using LinearAlgebra, PyPlot
+using LinearAlgebra, PyPlot, Random, IterativeSolvers, DelimitedFiles
 
 struct Parameters
     β::Float64
@@ -137,4 +137,75 @@ function distanceXY(arrayXY, N, Xmax, Ymax)
     CoordY[CoordY .< -Ymax/2] .+=Ymax
     # Create euclidean distance matrix
     R = sqrt.(CoordX[:,:].^2 + CoordY[:,:].^2)
+    return R
 end 
+
+
+function Trace_invD(D, dim; K=10, rng=MersenneTwister())
+    ξ = randn(rng,ComplexF64, (K,dim))
+    trace_invD=0
+    invD = inv(D)
+    for k = 1:K
+        trace_invD += adjoint(ξ[k,:])*invD*ξ[k,:]
+    end
+    return trace_invD/K
+end 
+
+"""
+Function to initialize a file and store the run paramaters. 
+The function creates a file according to filename containing the paramaters of the simulation. 
+This file can then be used to append the specific results to.
+
+Input: 
+    Filename (string + storage type (e.g. ".txt"))  The Filename with corresponding file type
+    lat     (Lattice struct)                        The lattice struct containing the lattice parameters
+    par     (Paramater struct)                      The paramater struct containing the fixed paramaters of the simulation (physical constants etc.)
+    method  (Optional, string:"w","a") Default: "w" Optional method string specifing the method for open (see https://docs.julialang.org/en/v1/base/io-network/ for specifc methods)
+
+"""
+function StoreConfigurationSettings(Filename, lat::Lattice, par::Parameters, HMC_par; method="w")
+    # Open file in append mode and then write to it
+    string = "Lm:\t$(lat.Lm)
+Ln:\t$(lat.Ln)
+Nt:\t$(lat.Nt)
+a:\t$(lat.a)
+D:\t$(lat.D)
+beta:\t$(par.β)
+kappa:\t$(par.κ)
+mass:\t$(par.mass)
+epsilon:\t$(par.ϵ)
+e2:\t$(par.e2)
+R0:\t$(par.R0)\n"
+    io = open(Filename,method)
+    write(io, string);
+    close(io);
+end 
+
+
+"""
+store results 
+"""
+
+function StoreResult(Filename, result)
+    Dim = length(size(result))
+    if Dim>2 
+        error("The storage method is unable to store higher dimensional arrays (3 or more dimensions)")
+    end 
+    writedlm(abspath(@__DIR__,string("../results/",Filename,".txt")), result) 
+end
+
+function ReadResult(Filename; complex=false)
+    if complex==false
+        result = readdlm(abspath(@__DIR__,string("../results/",Filename,".txt")))
+    else 
+        result = readdlm(abspath(@__DIR__,string("../results/",Filename,".txt")),'\t',Complex{Float64})       
+    end
+    return result
+end 
+
+function figure(Filename)
+end
+
+        
+
+

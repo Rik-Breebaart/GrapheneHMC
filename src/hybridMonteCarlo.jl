@@ -8,7 +8,13 @@ include("integrators.jl")
         
 function HybridMonteCarlo(S::Function, ∇S::Function, D::Integer, path_length, step_size, Nsamples::Integer; rng=MersenneTwister(), position_init=1.0, print_time=true, print_accept=true)
     #set up empty memory for the position and 
-    position = (2*rand(rng,D).-1).*position_init
+    if size(position_init)[1]>1
+        position = position_init
+    elseif size(position_init)[1] == 1
+        position = (2*rand(rng,D).-1).*position_init
+    else 
+        error("incorrect initial position is given")
+    end 
     configurations = zeros(Nsamples,D)
     randU = rand(rng,Float64,(Nsamples))
 
@@ -109,7 +115,13 @@ end
 
 function HybridMonteCarlo(S::Function, ∇S::Function, M_function::Function, D::Integer, path_length, step_size, Nsamples::Integer; rng=MersenneTwister(), position_init=1.0, print_time=true, print_accept=true)
     #set up empty memory for the position and 
-    ϕ = (2*rand(rng,D).-1).*position_init
+    if size(position_init)[1]>1
+        ϕ = position_init
+    elseif size(position_init)[1] == 1
+        ϕ = (2*rand(rng,D).-1).*position_init
+    else 
+        error("incorrect initial position is given")
+    end 
     configurations = zeros(Nsamples,D)
     randU = rand(rng,Float64,(Nsamples))
     randρ = randn(rng,ComplexF64, (Nsamples,D))
