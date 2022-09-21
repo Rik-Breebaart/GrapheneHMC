@@ -14,6 +14,7 @@ include(abspath(@__DIR__, "../src/observables.jl"))
 include(abspath(@__DIR__, "../src/tools.jl"))
 
 
+
 lat = Lattice(4, 4, 24)
 lat_analytic = Lattice(lat.Lm, lat.Ln, 24)
 par = Parameters(2.0, 0.5, 10.0, 0.5)
@@ -42,7 +43,8 @@ D = lat.D
 path_length = 10.0
 step_size = 0.05
 Nsamples= 100
-configurations, nreject = HybridMonteCarlo(S::Function, ∇S::Function, M_function::Function, D::Integer, path_length, step_size, Nsamples::Integer; rng=rng, position_init=10.0, print_H=true)
+
+configurations, nreject = HybridMonteCarlo(S::Function, ∇S::Function, M_function::Function, D::Integer, path_length, step_size, Nsamples::Integer; rng=rng, position_init=100 .*ones(lat.D), print_H=true))
 @show (Nsamples-nreject)/Nsamples
 
 res_spatial = [greens_function_spatial(M_function(configurations[i,:]), particle_x, particle_y, par, lat) for i in 1:Nsamples]

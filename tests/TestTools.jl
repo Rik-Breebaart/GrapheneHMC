@@ -1,6 +1,6 @@
 
 
-using LinearAlgebra, Test
+using LinearAlgebra, Test, Tables
 include(abspath(@__DIR__,"../src/hexagonalLattice.jl"))
 include(abspath(@__DIR__, "../src/tools.jl"))
 
@@ -21,7 +21,29 @@ function TestPermutation(par::Parameters, lat::Lattice)
     @test P==P_now
 end 
 
+function TestTrace(par::Parameters, lat::Lattice)
+    M = rand((lat.D,lat.D))
+    @time trM = tr(M)
+    @time trM_noisy = Trace_invD(M, lat.D, K =70)
+    @test isapprox(trM,trM_noisy, atol=0.1)
+end 
 
-lat = Lattice(2,2,64)
+function TestStorage(par::Parameters, lat::Lattice)
+    A = rand(ComplexF64,(lat.D, lat.D))
+    Filename = "test"
+    @time StoreResult(Filename, A)
+    @time B = ReadResult(Filename, complex=true)
+    @test A==B
+
+    A = rand(lat.D, lat.D)
+    Filename = "test"
+    @time StoreResult(Filename, A)
+    @time B = ReadResult(Filename, complex=false)
+    @test A==B
+end 
+
+lat = Lattice(2,2,6)
 par = Parameters(2.0, 0.0, 1.0, 0.5)
 TestPermutation(par, lat)
+TestStorage(par, lat)
+# TestTrace(par ,lat)
