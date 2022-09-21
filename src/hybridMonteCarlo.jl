@@ -115,10 +115,10 @@ end
 
 function HybridMonteCarlo(S::Function, ∇S::Function, M_function::Function, D::Integer, path_length, step_size, Nsamples::Integer; rng=MersenneTwister(), position_init=1.0, print_time=true, print_accept=true, print_H=false)
     #set up empty memory for the position and 
-    if size(position_init)[1]>1
-        ϕ = position_init
-    elseif size(position_init)[1] == 1
+    if length(position_init)[1] == 1
         ϕ = (2*rand(rng,D).-1).*position_init
+    elseif length(position_init)[1]>1
+        ϕ = position_init
     else 
         error("incorrect initial position is given")
     end 

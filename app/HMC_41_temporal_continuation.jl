@@ -18,9 +18,10 @@ include(abspath(@__DIR__, "../src/tools.jl"))
 par = Parameters(2.0, 0.5, 2.2/α, 0.5)
 Nts = [8,12,16,20,24]
 Δn_array = zeros((length(Nts)[1],2))
-lat_0 = Lattice(6, 6, 1)
+lat = Lattice(2, 2, 1)
+
 for i = 1:length(Nts)[1]
-    lat = Lattice(lat_0.Lm, lat_0.Ln, Nts[i])
+    change_lat(lat, Nt = Nts[i])
     #we will look at equation 41
     V = partialScreenedCoulomb_potential(par, lat)
     M_part = FermionicMatrix_int_41_saved_part(par, lat)
@@ -34,7 +35,7 @@ for i = 1:length(Nts)[1]
     path_length = 10.0
     step_size = 0.05
     Nsamples= 100
-    configurations, nreject = HybridMonteCarlo(S::Function, ∇S::Function, M_function::Function, D::Integer, path_length, step_size, Nsamples::Integer; rng=rng, position_init=10.0, print_H=true)
+    configurations, nreject = HybridMonteCarlo(S::Function, ∇S::Function, M_function::Function, D, path_length, step_size, Nsamples::Integer; rng=rng, position_init=10.0, print_H=true)
     @show (Nsamples-nreject)/Nsamples
 
     res_Δn = [Δn(M_function(configurations[i,:]), par, lat) for i in 1:Nsamples]
@@ -58,4 +59,4 @@ ylabel("1/Nt")
 xlabel(L"$\langle \Delta n \rangle")
 xlim([-0.05, (1/8)+0.05])
 grid()
-savefig(abspath(@__DIR__,string("../plots/SublatticeSpin_hmc_thermilization_41_continues_",lat_0.Lm,"_",lat_0.Ln,".png")))
+savefig(abspath(@__DIR__,string("../plots/SublatticeSpin_hmc_thermilization_41_continues_",lat.Lm,"_",lat.Ln,".png")))

@@ -12,7 +12,7 @@ Arguments:
     dim_sub (Int)   The number of sites per sublattice (Lm*Ln)
     D  (int)        The total dimension of the field (Lm*Ln*Nt*2)
 """
-struct Lattice
+mutable struct Lattice
     Lm::Int
     Ln::Int
     Nt::Int
@@ -25,6 +25,20 @@ end
 Lattice(Lm,Ln,Nt) = Lattice(Lm,Ln,Nt,0.71*10^(-3))
 Lattice(Lm,Ln,Nt,a) = Lattice(Lm,Ln,Nt,a,Lm*Ln)
 Lattice(Lm,Ln,Nt,a,dim_sub) = Lattice(Lm,Ln,Nt,a,dim_sub,dim_sub*2*Nt)
+
+function change_lat(lat::Lattice; Nt= 0, Lm=0, Ln=0)
+    if Nt!==0
+        lat.Nt = Nt
+    end 
+    if Lm!==0
+        lat.Lm = Lm
+    end 
+    if Ln!==0
+        lat.Lm=Lm
+    end 
+    lat.D = lat.dim_sub*lat.Nt*2
+    lat.dim_sub = lat.Lm*lat.Ln
+end 
 
 struct Particle
     m::Int
