@@ -1,0 +1,6 @@
+#!/bin/bash
+~/bin/julia ~/GrapheneHMC/app/HMC_41_temporal_continuation.jl
+
+
+
+

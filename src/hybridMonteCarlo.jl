@@ -107,7 +107,7 @@ end
 #now hybrid monte carlo specific for the graphene problem (thus also including a complex gaussian ρ)
 
 
-function HybridMonteCarlo(S::Function, ∇S::Function, M_function::Function, D::Integer, path_length, step_size, Nsamples::Integer; rng=MersenneTwister(), position_init=1.0, print_time=true, print_accept=true)
+function HybridMonteCarlo(S::Function, ∇S::Function, M_function::Function, D::Integer, path_length, step_size, Nsamples::Integer; rng=MersenneTwister(), position_init=1.0, print_time=true, print_accept=true, print_H=false)
     #set up empty memory for the position and 
     ϕ = (2*rand(rng,D).-1).*position_init
     configurations = zeros(Nsamples,D)
@@ -138,6 +138,9 @@ function HybridMonteCarlo(S::Function, ∇S::Function, M_function::Function, D::
 
         #step 3A: compute the energy difference for Metropolis-Hastings check
         ΔH = H_final-H_init
+        if print_H==true
+            @show ΔH
+        end
         #step 3B: perform metropolis check
         if randU[i] > exp(-real(ΔH))
             nreject += 1
@@ -148,7 +151,7 @@ function HybridMonteCarlo(S::Function, ∇S::Function, M_function::Function, D::
                 println("Accepted ",i-nreject)
             end
         end
-        configurations[i,:] .= ϕ
+        configurations[i,:] = ϕ
 
         if  print_time==true            
             endtime = time()

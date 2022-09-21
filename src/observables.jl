@@ -67,3 +67,13 @@ function Δn_time(M, par::Parameters, lat::Lattice)
     end 
     return 2*(correlator[:,1,1]-correlator[:,2,2])
 end
+
+function HubbardStratonovichField(ϕ, Pab, par::Parameters, lat::Lattice)
+    ind_part = lat.dim_sub*lat.Nt
+    if Pab==0
+        return mean(ϕ[1:ind_part])
+    elseif Pab==1
+        return mean(ϕ[ind_part+1:lat.D])
+    end
+    return 0
+end 
