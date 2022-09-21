@@ -12,11 +12,11 @@ include(abspath(@__DIR__, "../src/observables.jl"))
 include(abspath(@__DIR__, "../src/tools.jl"))
 
 
-lat = Lattice(6, 6, 24)
-lat_analytic = Lattice(lat.Lm, lat.Ln, 24)
+lat = Lattice(16, 16, 64)
+lat_analytic = Lattice(lat.Lm, lat.Ln, 64)
 
+par = Parameters(2.0, 0.5, 1.0, 0.5)
 
-par = Parameters(2.0, 5.0, 1.0, 0.5)
 int(x) = floor(Int, x)
 particle_x = Particle(1, 1, 0, 1)
 particle_y = Particle(1, 1, 0, 1)

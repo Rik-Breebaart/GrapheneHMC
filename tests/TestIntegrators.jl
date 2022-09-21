@@ -421,8 +421,8 @@ Test_LeapFrogPQP()
 Test_LeapFrogQPQ()
 
 par = Parameters(2.0, 0.0, 1.0, 0.5)
-lat = Lattice(2, 2, 6)
-path_len = 5.0
+lat = Lattice(4, 4, 12)
+path_len = 10.0
 step_size = 0.05
 atol = 0.3
 # test for potential component of the action 
