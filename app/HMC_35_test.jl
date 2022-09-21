@@ -16,7 +16,7 @@ include(abspath(@__DIR__, "../src/tools.jl"))
 
 lat = Lattice(4, 4, 16)
 lat_analytic = Lattice(lat.Lm, lat.Ln, 16)
-par = Parameters(2.0, 0.5, 250.0, 0.5)
+par = Parameters(2.0, 0.5, 10.0, 0.5)
 
 particle_x = Particle(1, 1, 0, 1)
 particle_y = Particle(1, 1, 0, 1)
@@ -40,14 +40,27 @@ S(ϕ, χ) = Action_V_cg(ϕ, V, par ,lat) + Action_M_cg(χ, M_function(ϕ), par ,
 ∇S(ϕ, χ) = ∇S_V_cg(ϕ, V, par, lat)+∇S_M_eq35_cg(ϕ, χ, M_function(ϕ), par, lat)
 D = lat.D
 path_length = 10.0
-step_size = 0.25
+step_size = 0.05
 Nsamples= 100
-configurations, nreject = HybridMonteCarlo(S::Function, ∇S::Function, M_function::Function, D::Integer, path_length, step_size, Nsamples::Integer; rng=rng)
+configurations, nreject = HybridMonteCarlo(S::Function, ∇S::Function, M_function::Function, D::Integer, path_length, step_size, Nsamples::Integer; rng=rng, position_init=10.0, print_H=true)
 @show (Nsamples-nreject)/Nsamples
 
 res_spatial = [greens_function_spatial(M_function(configurations[i,:]), particle_x, particle_y, par, lat) for i in 1:Nsamples]
 res_momentum = [greens_function_kspace(M_function(configurations[i,:]), ks(1,1), par, lat) for i in 1:Nsamples]
 res_Δn = [Δn(M_function(configurations[i,:]), par, lat) for i in 1:Nsamples]
+res_ϕ_A = [HubbardStratonovichField(configurations[i,:],0, par, lat) for i in 1:Nsamples]
+clf()
+plot(res_ϕ_A)
+xlabel("sweeps")
+ylabel(L"$\langle \phi_A \rangle$")
+savefig(abspath(@__DIR__,"../plots/phi_A_hmc_thermilization_35"))
+
+clf()
+plot(res_Δn)
+xlabel("sweeps")
+ylabel(L"$\langle \phi_A \rangle$")
+savefig(abspath(@__DIR__,"../plots/phi_A_hmc_thermilization_35"))
+
 Δn_M = mean(res_Δn)
 correlator_M = mean(res_spatial)
 correlator_M_momentum = mean(res_momentum)
