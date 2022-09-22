@@ -203,9 +203,42 @@ function ReadResult(Filename; complex=false)
     return result
 end 
 
-function figure(Filename)
+function CreateFigure(x, y, Folder, Filename,;y_err=nothing, fmt=".", x_label=nothing, y_label=nothing, figure_title=nothing)
+    clf()
+    if y_err===nothing
+        plot(x,y,fmt)
+    else 
+        errorbar(x,y,yerr=y_err,fmt=fmt)
+    end
+    if x_label!==nothing
+        xlabel(x_label)
+    end 
+    if y_label!==nothing
+        ylabel(y_label)
+    end
+    if figure_title!==nothing
+        title(figure_title)
+    end
+    savefig(abspath(@__DIR__,string("../results/",Folder,"/",Filename,".png")))
 end
 
-        
+function CreateFigure(y, Folder, Filename,;y_err=nothing, fmt=".", x_label=nothing, y_label=nothing, figure_title=nothing)
+    clf()
+    if y_err===nothing
+        plot(y,fmt)
+    else 
+        errorbar(1:length(y)[1],y,yerr=y_err,fmt=fmt)
+    end
+    if x_label!==nothing
+        xlabel(x_label)
+    end 
+    if y_label!==nothing
+        ylabel(y_label)
+    end
+    if figure_title!==nothing
+        title(figure_title)
+    end
+    savefig(abspath(@__DIR__,string("../results/",Folder,"/",Filename,".png")))
+end        
 
 
