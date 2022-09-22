@@ -5,8 +5,34 @@ This file will contain the implementation for hybrid monte carlo in a general ma
 using Random, Random.DSFMT, Distributions, LinearAlgebra
 include("integrators.jl")
 
-        
-function HybridMonteCarlo(S::Function, ∇S::Function, D::Integer, path_length, step_size, Nsamples::Integer; rng=MersenneTwister(), position_init=1.0, print_time=true, print_accept=true)
+"""
+Hybrid monte carlo following the code from https://gist.github.com/Shoichiro-Tsutsui/53eb534f6794e1eece55b1d5a7c118fe 
+with the fields changed to reflect those in the paper (10.1103/PhysRevB.89.195429)
+The hybrid monte caro performs the following steps:
+step 0: initialize the system
+step 1: sample the momentum 
+step 2: Perform the hamiltonian monte carlo by using an integrator
+step 3: compare the difference between the hamiltonian before and after the integration scheme and keep based on metropolis acceptance
+
+Input: 
+    S       (function)      The function corresponding to the action of the system
+    ∇S      (function)      The funtion corresponding to the derivative of the action
+    M_funciton (function)   Function which creates the fermionic matrix
+    D       (Integer)       The dimensions of the field (space X time)
+    path_length (Float)     The path length of the integration scheme
+    step_size  (Float)      The size of the steps in the integration
+    Nsample (Integer)       The number of samples obtained using the montecarlo scheme (all the accepted cases)
+Optional:
+    rng                     The Random number generator used (if not provided MersenneTwister() is used)
+    position_init  (Vector of D Floats or single float)         The initial value of the position field from which the hamiltonian dynamics starts (default: 1.0)
+    print_time     (bool)   Indicates wheter the run time of single sample is printed (default=true)
+    print_accept   (bool)   Indicates wheter the acceptance of single sample is printed (default=true)      
+    print_H=false  (bool)   Indicates whether the hamiltonian difference is printed after each integration (default=false)
+Output:
+    conf    (Nsample X n float) The obtained Nsample configurations of the discretized field
+    nreject  (Integer)      The nunber of rejections before reaching the Nsample configurations
+"""       
+function HybridMonteCarlo(S::Function, ∇S::Function, D::Integer, path_length, step_size, Nsamples::Integer; rng=MersenneTwister(), position_init=1.0, print_time=true, print_accept=true, print_H=false)
     #set up empty memory for the position and 
     if size(position_init)[1]>1
         position = position_init
@@ -63,13 +89,37 @@ function HybridMonteCarlo(S::Function, ∇S::Function, D::Integer, path_length, 
 end 
 
 
-function MetropolisHastingsMonteCarlo(S, D, step_size, Nsamples; rng=MersenneTwister(), position_init=1.0, print_time=false, print_accept=false)
+"""
+Metropolis Hastings Monte Carlo sampler
+
+Input: 
+    S      (function)      The function corresponding to the action of the system
+    D       (Integer)       The dimensions of the field
+    step_size  (Float)      The size of the steps in the integration
+    Nsample (Integer)       The number of samples obtained using the montecarlo scheme (all the accepted cases)
+Optional:
+    rng                     The Random number generator used (if not provided MersenneTwister() is used)
+    position_init  (Vector of D Floats or single float)         The initial value of the position field from which the hamiltonian dynamics starts (default: 1.0)
+    print_time     (bool)   Indicates wheter the run time of single sample is printed (default=true)
+    print_accept   (bool)   Indicates wheter the acceptance of single sample is printed (default=true)      
+    print_H=false  (bool)   Indicates whether the hamiltonian difference is printed after each integration (default=false)  
+Output:
+    conf    (Nsample X n float) The obtained Nsample configurations of the discretized field
+    nreject  (Integer)      The nunber of rejections before reaching the Nsample configurations
+"""
+function MetropolisHastingsMonteCarlo(S, D, step_size, Nsamples; rng=MersenneTwister(), position_init=1.0, print_time=false, print_accept=false, print_H=false)
     #set up empty memory for the position and 
     configurations = zeros(Nsamples,D)
 
     #count the rejections
     nreject = 0
-    position = (2*rand(rng,D).-1).*position_init
+    if size(position_init)[1]>1
+        position = position_init
+    elseif size(position_init)[1] == 1
+        position = (2*rand(rng,D).-1).*position_init
+    else 
+        error("incorrect initial position is given")
+    end 
     position_trial = zeros(D)
     randstep = rand(rng,Float64, (Nsamples, D)).*2 .-1
     randU = rand(rng,Float64,(Nsamples))
@@ -89,6 +139,9 @@ function MetropolisHastingsMonteCarlo(S, D, step_size, Nsamples; rng=MersenneTwi
 
         #step 3A: compute the energy difference for Metropolis-Hastings check
         ΔH = H_final-H_init
+        if print_H===true
+            @show ΔH
+        end
         #step 3B: perform metropolis check
         if randU[i] >= exp(-real(ΔH))
             nreject += 1
@@ -110,9 +163,35 @@ function MetropolisHastingsMonteCarlo(S, D, step_size, Nsamples; rng=MersenneTwi
 end 
 
 
-#now hybrid monte carlo specific for the graphene problem (thus also including a complex gaussian ρ)
+#========{now hybrid monte carlo specific for the graphene problem (thus also including a complex gaussian ρ)}==========#
 
+"""
+Metropolis Hatings monte carlo for graphene
+with the fields changed to reflect those in the paper (10.1103/PhysRevB.89.195429)
+The hybrid monte caro performs the following steps:
+step 0: initialize the system
+step 1: sample the momentum 
+step 2: Perform the hamiltonian monte carlo by using an integrator
+step 3: compare the difference between the hamiltonian before and after the integration scheme and keep based on metropolis acceptance
 
+Input: 
+    S       (function)      The function corresponding to the action of the system
+    ∇S      (function)      The funtion corresponding to the derivative of the action
+    M_funciton (function)   Function which creates the fermionic matrix
+    D       (Integer)       The dimensions of the field (space X time)
+    path_length (Float)     The path length of the integration scheme
+    step_size  (Float)      The size of the steps in the integration
+    Nsample (Integer)       The number of samples obtained using the montecarlo scheme (all the accepted cases)
+Optional:
+    rng                     The Random number generator used (if not provided MersenneTwister() is used)
+    position_init  (Vector of D Floats or single float)         The initial value of the position field from which the hamiltonian dynamics starts (default: 1.0)
+    print_time     (bool)   Indicates wheter the run time of single sample is printed (default=true)
+    print_accept   (bool)   Indicates wheter the acceptance of single sample is printed (default=true)      
+    print_H=false  (bool)   Indicates whether the hamiltonian difference is printed after each integration (default=false)
+Output:
+    conf    (Nsample X n float) The obtained Nsample configurations of the discretized field
+    nreject  (Integer)      The nunber of rejections before reaching the Nsample configurations
+"""
 function HybridMonteCarlo(S::Function, ∇S::Function, M_function::Function, D::Integer, path_length, step_size, Nsamples::Integer; rng=MersenneTwister(), position_init=1.0, print_time=true, print_accept=true, print_H=false)
     #set up empty memory for the position and 
     if size(position_init)[1]>1
