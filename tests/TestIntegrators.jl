@@ -53,6 +53,54 @@ function Test_LeapFrogQPQ()
     @test isapprox(q_inverted,-q_old,atol=0.001)
 end
 
+function Test_LeapFrogPQP_plot()
+    rng = MersenneTwister()
+    path_len = 10.0
+    step_size = 0.01
+    D = 1
+    p_0 = rand(rng,(D))
+    q_0 = ones(D)
+    H(p,q) = sum(q.^2)/2 + sum(p.^2)/2
+    pot(p) = sum(p.^2)/2
+    dpdt(q) = q
+    dqdt(p) = -p
+    H_init = H(p_0,q_0)
+    p_old,q_old = copy(p_0),copy(q_0)
+    p,q, H_store, U_store, K_store = LeapFrogPQP_store(path_len, step_size, p_0, q_0, dqdt, pot)
+    H_final = H(p,q)
+    @test isapprox(H_init,H_final,atol=0.001)
+    @test isapprox(H_store[1],H_store[end],atol=0.001)
+
+    p_inverted,q_inverted, H_store, U_store, K_store  = LeapFrogPQP_store(path_len, step_size, p, -q, dqdt, pot)
+    @test isapprox(H_store[1],H_store[end],atol=0.001)
+    @test isapprox(p_inverted,p_old,atol=0.001)
+    @test isapprox(q_inverted,-q_old,atol=0.001)
+end
+
+function Test_LeapFrogQPQ_plot()
+    rng = MersenneTwister()
+    path_len = 10.0
+    step_size = 0.01
+    D = 1
+    p_0 = rand(rng,(D))
+    q_0 = ones(D)
+    H(p,q) = sum(q.^2)/2 + sum(p.^2)/2
+    pot(p) = sum(p.^2)/2
+    dpdt(q) = q
+    dqdt(p) = -p
+    H_init = H(p_0,q_0)
+    p_old,q_old = copy(p_0),copy(q_0)
+    p,q, H_store, U_store, K_store = LeapFrogQPQ_store(path_len, step_size, p_0, q_0, dqdt, pot)
+    H_final = H(p,q)
+    @test isapprox(H_init,H_final,atol=0.001)
+    @test isapprox(H_store[1],H_store[end],atol=0.001)
+
+    p_inverted,q_inverted, H_store, U_store, K_store  = LeapFrogQPQ_store(path_len, step_size, p, -q, dqdt, pot)
+    @test isapprox(H_store[1],H_store[end],atol=0.001)
+    @test isapprox(p_inverted,p_old,atol=0.001)
+    @test isapprox(q_inverted,-q_old,atol=0.001)
+end
+
 #========================= integration for eq 35 ==========================#
 
 
@@ -419,6 +467,8 @@ end
 
 Test_LeapFrogPQP()
 Test_LeapFrogQPQ()
+Test_LeapFrogPQP_plot()
+Test_LeapFrogQPQ_plot()
 
 par = Parameters(2.0, 0.0, 1.0, 0.5)
 lat = Lattice(4, 4, 12)

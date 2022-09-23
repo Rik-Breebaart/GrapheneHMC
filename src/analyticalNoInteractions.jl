@@ -2,6 +2,31 @@ using LinearAlgebra
 include("hexagonalLattice.jl")
 include("tools.jl")
 
+
+"""
+Analytical solution for the greens function of graphene in the spatial domain. 
+The greens function is split into the sublattice connections (AA,AB,BA,BB)
+The basis of the vectors that is used is the basis as described in (Arxiv:1403.3620)
+The K space basis is the reciprocal of the position space basis scaled within the brilouine zone.
+
+The hamiltonian of the system is given in k-space and then converted to real space through a discrete fourier tranform 
+F(x) = (1/sqrt(N))∑f(k)exp{ikx}
+F(t) = (1/sqrt(β))∑f(ω)exp(iωt)
+
+For the temporal derivative in matsubara frequencies a discrete forward derivative is used converted to matsubara 
+frequency space using fourier transform.
+G = inv(f(ω) + h(k))
+
+
+Input: 
+    particle_x  (Particle)  particle for which the position is used
+    particle_y  (Particle)  particle for which the position is used
+    lat (Lattice struct)            Lattice struct containing the lattice paramaters (Lm, LN, Nt, a, dim_sub, D)
+    par (Paramaters struct)         Paramaters struct containing the run paramaters (α, β etc.)
+Output: 
+    correlator (4xlat.Nt)   The greens function in position space.
+
+"""
 function greensFunctionGraphene_spatial(particle_x::Particle, particle_y::Particle, par::Parameters, lat::Lattice)
     v_a = sqrt(3)*lat.a*[1,0]
     v_b = sqrt(3)*lat.a*[1,sqrt(3)]/2
@@ -48,7 +73,29 @@ function greensFunctionGraphene_spatial(particle_x::Particle, particle_y::Partic
 end 
 
 
+"""
+Analytical solution for the greens function of graphene in the spatial domain. 
+The greens function is split into the sublattice connections (AA,AB,BA,BB)
+The basis of the vectors that is used is the basis as described in (Arxiv:1403.3620)
+The K space basis is the reciprocal of the position space basis scaled within the brilouine zone.
 
+The hamiltonian of the system is given in k-space and then converted to real space through a discrete fourier tranform 
+F(x) = (1/sqrt(N))∑f(k)exp{ikx}
+F(t) = (1/sqrt(β))∑f(ω)exp(iωt)
+
+For the temporal derivative in matsubara frequencies a discrete forward derivative is used converted to matsubara 
+frequency space using fourier transform.
+G = inv(f(ω) + h(k))
+
+
+Input: 
+    K (Float vector of 2)           The vector of momentum coordinates to which the greens function is computed
+    lat (Lattice struct)            Lattice struct containing the lattice paramaters (Lm, LN, Nt, a, dim_sub, D)
+    par (Paramaters struct)         Paramaters struct containing the run paramaters (α, β etc.)
+Output: 
+    correlator (4xlat.Nt)   The greens function in momentum space (and time).
+    
+"""
 function greensFunctionGraphene_kspace(k,par,lat)
     v_a = sqrt(3)*lat.a*[1,0]
     v_b = sqrt(3)*lat.a*[1,sqrt(3)]/2
@@ -86,6 +133,36 @@ function greensFunctionGraphene_kspace(k,par,lat)
     return correlator./(par.β)
 end 
 
+
+"""
+Analytical solution for the sublatice spin difference of graphene.
+This is computed through the correlator greens functions in space.
+The greens function is split into the sublattice connections (AA,AB,BA,BB)
+The basis of the vectors that is used is the basis as described in (Arxiv:1403.3620)
+The K space basis is the reciprocal of the position space basis scaled within the brilouine zone.
+
+The hamiltonian of the system is given in k-space and then converted to real space through a discrete fourier tranform 
+F(x) = (1/N)∑f(k)exp{ikx}
+F(t) = (1/β)∑f(ω)exp(iωt)
+
+For the temporal derivative in matsubara frequencies a discrete forward derivative is used converted to matsubara 
+frequency space using fourier transform.
+G = inv(f(ω) + h(k))
+
+then 
+Δn(τ) = 2*(G_AA(τ) - G_BB(τ))
+where it is multiplied by to since the fermionic hmc observable contains both spin up and down degrees of freedom 
+with the same greens function.
+
+
+Input: 
+    K (Float vector of 2)           The vector of momentum coordinates to which the greens function is computed
+    lat (Lattice struct)            Lattice struct containing the lattice paramaters (Lm, LN, Nt, a, dim_sub, D)
+    par (Paramaters struct)         Paramaters struct containing the run paramaters (α, β etc.)
+Output: 
+    Δn(τ) (lat.Nt)                  The sublatice spin difference as a function of τ
+    
+"""
 function Δn_no_int_time(par::Parameters, lat::Lattice)
     v_a = sqrt(3)*lat.a*[1,0]
     v_b = sqrt(3)*lat.a*[1,sqrt(3)]/2
@@ -136,7 +213,34 @@ function Δn_no_int_time(par::Parameters, lat::Lattice)
     return Δn./(par.β*lat.dim_sub)
 end 
 
+"""
+Analytical solution for the sublatice spin difference of graphene.
+This is computed through the correlator greens functions in space.
+The greens function is split into the sublattice connections (AA,AB,BA,BB)
+The basis of the vectors that is used is the basis as described in (Arxiv:1403.3620)
+The K space basis is the reciprocal of the position space basis scaled within the brilouine zone.
 
+The hamiltonian of the system is given in k-space and then converted to real space through a discrete fourier tranform 
+F(x) = (1/N)∑f(k)exp{ikx}
+F(t) = (1/β)∑f(ω)exp(iωt)
+
+For the temporal derivative in matsubara frequencies a discrete forward derivative is used converted to matsubara 
+frequency space using fourier transform.
+G = inv(f(ω) + h(k))
+
+then 
+Δn = 2*(G_AA - G_BB)
+where it is multiplied by to since the fermionic hmc observable contains both spin up and down degrees of freedom 
+with the same greens function.
+
+
+Input: 
+    K (Float vector of 2)           The vector of momentum coordinates to which the greens function is computed
+    lat (Lattice struct)            Lattice struct containing the lattice paramaters (Lm, LN, Nt, a, dim_sub, D)
+    par (Paramaters struct)         Paramaters struct containing the run paramaters (α, β etc.)
+Output: 
+    Δn                              The sublatice spin difference
+"""        
 function Δn_no_int(par::Parameters, lat::Lattice)
     v_a = sqrt(3)*lat.a*[1,0]
     v_b = sqrt(3)*lat.a*[1,sqrt(3)]/2
