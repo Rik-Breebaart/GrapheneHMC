@@ -7,6 +7,18 @@ include("tools.jl")
 include("hamiltonianNoInteractions.jl")
 #==================================== Matrix eq 35 ============================================#
 
+"""
+Function to obtain the fermionic matrix M given by eq.35 from: 10.1103/PhysRevB.89.195429.
+
+Input:
+    ϕ   (Vector of D Floats)        Hubbard-Coulomb fields
+    V   (Matrix of D x D Floats)    The Interaction potential between sites
+    lat (Lattice struct)            Lattice struct containing the lattice paramaters (Lm, LN, Nt, a, dim_sub, D)
+    par (Paramaters struct)         Paramaters struct containing the run paramaters (α, β etc.)
+
+Output:
+    M  (Matrix of D x D Complex Floats) The fermionic matrix
+"""
 function FermionicMatrix_int_35(ϕ, V, par::Parameters, lat::Lattice)
     # determine the temporal spacing
     δ=par.β/lat.Nt
@@ -24,6 +36,18 @@ function FermionicMatrix_int_35(ϕ, V, par::Parameters, lat::Lattice)
     return M
 end 
 
+"""
+Function to obtain the part of the fermionic matrix M which does not depend on ϕ given by eq.35 from: 10.1103/PhysRevB.89.195429.
+This matrix does thus not contain the ϕ related component
+
+Input:
+    V   (Matrix of D x D Floats)    The Interaction potential between sites
+    lat (Lattice struct)            Lattice struct containing the lattice paramaters (Lm, LN, Nt, a, dim_sub, D)
+    par (Paramaters struct)         Paramaters struct containing the run paramaters (α, β etc.)
+
+Output:
+    M_part  (Matrix of D x D Complex Floats) The fermionic matrix part independent of ϕ
+"""
 function FermionicMatrix_int_35_saved_part(V, par::Parameters, lat::Lattice)
     # determine the temporal spacing
     δ=par.β/lat.Nt
@@ -41,6 +65,22 @@ function FermionicMatrix_int_35_saved_part(V, par::Parameters, lat::Lattice)
     return M
 end 
 
+
+"""
+Function to obtain the fermionic matrix M with numerical improved replacement
+using the U(1) gauge invariance in the V_xx component of the Coulomb interaction.
+(eg. eq.41 from: 10.1103/PhysRevB.89.195429)
+ 
+Created as a matrix M + A[ϕ] where M is a supplied matrix which does not change during the simulations and A[ϕ] does change.
+Input:
+    ϕ   (Vector of D Floats)        Hubbard-Coulomb fields
+    M_part (Matrix of D x D Complex Floats) The ϕ independent part of the fermionic matrix
+    lat (Lattice struct)            Lattice struct containing the lattice paramaters
+    par (Paramaters struct)         Paramaters struct containing the run paramaters (α, β etc.)           
+
+Output:
+    M  (Matrix of D x D Complex Floats) The fermionic matrix
+"""
 function FermionicMatrix_int_35_phi_part(ϕ, M_saved_part, par::Parameters, lat::Lattice)
     # determine the temporal spacing
     δ=par.β/lat.Nt
@@ -51,6 +91,19 @@ end
 
 #==================================== Matrix eq 41 ============================================#
 
+"""
+Function to obtain the fermionic matrix M with numerical improved replacement
+using the U(1) gauge invariance in the V_xx component of the Coulomb interaction.
+(eg. eq.41 from: 10.1103/PhysRevB.89.195429)
+
+Input:
+    ϕ   (Vector of D Floats)        Hubbard-Coulomb fields
+    lat (Lattice struct)            Lattice struct containing the lattice paramaters (Lm, LN, Nt, a, dim_sub, D)
+    par (Paramaters struct)         Paramaters struct containing the run paramaters (α, β etc.)
+
+Output:
+    M  (Matrix of D x D Complex Floats) The fermionic matrix
+"""
 function FermionicMatrix_int_41(ϕ, par::Parameters, lat::Lattice)
     # determine the temporal spacing
     δ=par.β/lat.Nt
@@ -68,6 +121,20 @@ function FermionicMatrix_int_41(ϕ, par::Parameters, lat::Lattice)
     return M
 end 
 
+"""
+Function to obtain constant component of the fermionic matrix M with numerical improved replacement
+using the U(1) gauge invariance in the V_xx component of the Coulomb interaction. 
+(eg. eq.41 from: 10.1103/PhysRevB.89.195429)
+
+This matrix does thus not contain the ϕ related component
+
+Input:
+    lat (Lattice struct)            Lattice struct containing the lattice paramaters (Lm, LN, Nt, a, dim_sub, D)
+    par (Paramaters struct)         Paramaters struct containing the run paramaters (α, β etc.)
+
+Output:
+    M_part  (Matrix of D x D Complex Floats) The fermionic matrix part independent of ϕ
+"""
 function FermionicMatrix_int_41_saved_part(par::Parameters, lat::Lattice)
     # determine the temporal spacing
     δ=par.β/lat.Nt
@@ -81,6 +148,21 @@ function FermionicMatrix_int_41_saved_part(par::Parameters, lat::Lattice)
 end 
 
 
+"""
+Function to obtain the fermionic matrix M with numerical improved replacement
+using the U(1) gauge invariance in the V_xx component of the Coulomb interaction.
+(eg. eq.41 from: 10.1103/PhysRevB.89.195429)
+
+Created as a matrix M + A[ϕ] where M is a supplied matrix which does not change during the simulations and A[ϕ] does change.
+Input:
+    ϕ   (Vector of D Floats)        Hubbard-Coulomb fields
+    M_part (Matrix of D x D Complex Floats) The ϕ independent part of the fermionic matrix
+    lat (Lattice struct)            Lattice struct containing the lattice paramaters
+    par (Paramaters struct)         Paramaters struct containing the run paramaters (α, β etc.)           
+
+Output:
+    M  (Matrix of D x D Complex Floats) The fermionic matrix
+"""
 function FermionicMatrix_int_41_phi_part(ϕ, M_saved_part, par::Parameters, lat::Lattice)
     # determine the temporal spacing
     δ=par.β/lat.Nt

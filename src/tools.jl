@@ -141,6 +141,19 @@ function distanceXY(arrayXY, N, Xmax, Ymax)
 end 
 
 
+"""
+Function to determine the trace of the inverse of matrix D using the noisy estimator method.
+
+Input:
+    D   (Matrix)    The matrix of which the inverse trace is computed
+    dim (Int)       The size of the matrix
+    K   (Int)       The number of random vectors are used to compute the noisy estimator
+Optional:
+    rng             The random number generator used (Default = MersenneTwister() )
+
+Output:
+    Trace(inv(D))   The noisy estimator of the trace of inv(D)
+"""
 function Trace_invD(D, dim; K=10, rng=MersenneTwister())
     ξ = randn(rng,ComplexF64, (K,dim))
     trace_invD=0
@@ -183,9 +196,12 @@ end
 
 
 """
-store results 
-"""
+Function to store results to a file.
 
+Input:
+    Filename (string)   The filename and folder to which the result is stored (starting within the results folder)
+    result (array)      The array which is stored (can be either 1 or 2 dimensional)    
+"""
 function StoreResult(Filename, result)
     Dim = length(size(result))
     if Dim>2 
@@ -194,6 +210,14 @@ function StoreResult(Filename, result)
     writedlm(abspath(@__DIR__,string("../results/",Filename,".txt")), result) 
 end
 
+"""
+Function to read the stored results from a file.
+
+Input:
+    Filename (string)   The filename and folder to which the result is stored (starting within the results folder)
+Optional:
+    Complex (bool)      Indicates whether the result in the stored file are complex or not.
+"""
 function ReadResult(Filename; complex=false)
     if complex==false
         result = readdlm(abspath(@__DIR__,string("../results/",Filename,".txt")))
@@ -203,9 +227,72 @@ function ReadResult(Filename; complex=false)
     return result
 end 
 
-function figure(Filename)
+"""
+Function to create a PyPlot figure (to decluter application scripts and store to results folder)
+
+Input:
+    x    (Array)        The x coordinates for the plot
+    y    (array)        The y coordinates for the plot
+    Folder  (string)    THe folder inside the "results" folder to which the plot should be stored
+    Filename   (string) The filename of the figure
+Optional:
+    y_err   (array)     The error of the results on the y-coordinates (default: nothing)
+    fmt     (string)    The marker method used for the plot (default: ".")
+    x_label (string)    The x axis label (default: nothing)
+    y_label (string)    The y axis label (default: nothing)
+    figure_title (string) The figure title (default: nothing)
+"""
+function CreateFigure(x, y, Folder, Filename,;y_err=nothing, fmt=".", x_label=nothing, y_label=nothing, figure_title=nothing)
+    clf()
+    if y_err===nothing
+        plot(x,y,fmt)
+    else 
+        errorbar(x,y,yerr=y_err,fmt=fmt)
+    end
+    if x_label!==nothing
+        xlabel(x_label)
+    end 
+    if y_label!==nothing
+        ylabel(y_label)
+    end
+    if figure_title!==nothing
+        title(figure_title)
+    end
+    savefig(abspath(@__DIR__,string("../results/",Folder,"/",Filename,".png")))
 end
 
-        
+"""
+Function to create a PyPlot figure (to decluter application scripts and store to results folder)
+if no x array is provided.
+
+Input:
+    y    (array)        The y coordinates for the plot
+    Folder  (string)    THe folder inside the "results" folder to which the plot should be stored
+    Filename   (string) The filename of the figure
+Optional:
+    y_err   (array)     The error of the results on the y-coordinates (default: nothing)
+    fmt     (string)    The marker method used for the plot (default: ".")
+    x_label (string)    The x axis label (default: nothing)
+    y_label (string)    The y axis label (default: nothing)
+    figure_title (string) The figure title (default: nothing)
+"""
+function CreateFigure(y, Folder, Filename,;y_err=nothing, fmt=".", x_label=nothing, y_label=nothing, figure_title=nothing)
+    clf()
+    if y_err===nothing
+        plot(y,fmt)
+    else 
+        errorbar(1:length(y)[1],y,yerr=y_err,fmt=fmt)
+    end
+    if x_label!==nothing
+        xlabel(x_label)
+    end 
+    if y_label!==nothing
+        ylabel(y_label)
+    end
+    if figure_title!==nothing
+        title(figure_title)
+    end
+    savefig(abspath(@__DIR__,string("../results/",Folder,"/",Filename,".png")))
+end        
 
 

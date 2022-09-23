@@ -42,8 +42,19 @@ function TestStorage(par::Parameters, lat::Lattice)
     @test A==B
 end 
 
+function TestFigureFunction(par::Parameters, lat::Lattice)
+    ϕ = rand(lat.D)
+    error = ones(lat.D)
+    step = 1:1:lat.D
+    CreateFigure(ϕ,"plots","testFigure",fmt="-", x_label="x", y_label=L"$\Delta$ niks")
+    CreateFigure(ϕ,"plots","testFigure",fmt="*", y_err=error, x_label="x", y_label=L"$\Delta$ niks")
+    CreateFigure(step, ϕ,"plots","testFigure", fmt="o", x_label="x", y_label=L"$\Delta$ niks")
+    CreateFigure(step, ϕ,"plots","testFigure", y_err=error, fmt="o", x_label="x", y_label=L"$\Delta$ niks")
+end
+
 lat = Lattice(2,2,6)
 par = Parameters(2.0, 0.0, 1.0, 0.5)
 TestPermutation(par, lat)
 TestStorage(par, lat)
+TestFigureFunction(par, lat)
 # TestTrace(par ,lat)

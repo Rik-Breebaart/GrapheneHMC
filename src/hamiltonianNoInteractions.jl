@@ -26,6 +26,18 @@ function HamiltonianMatrix_no_int(par::Parameters, lat::Lattice)
     return H 
 end 
 
+
+"""
+Function to obtain the fermionic matrix M of a tight binding model with added mass term. 
+This fermionic matrix does not contain the terms for a interaction.
+
+Input:
+    lat (Lattice struct)            Lattice struct containing the lattice paramaters (Lm, LN, Nt, a, dim_sub, D)
+    par (Paramaters struct)         Paramaters struct containing the run paramaters (α, β etc.)
+
+Output:
+    M  (Matrix of D x D Complex Floats) The fermionic matrix for a system without interactions
+"""
 function FermionicMatrix_no_int(par::Parameters,lat::Lattice)
     # determine the temporal spacing
     δ=par.β/lat.Nt
