@@ -11,6 +11,14 @@ include("tools.jl")
 
 
 """
+Function for the coulomb potential (∝ 1/r) between the particles on the hexagonal matrix.
+We use Gaussian system of electromagnetic units.
+
+Input:
+    par (Paramaters struct)         Paramaters struct containing the run paramaters (α, β etc.)
+    lat (Lattice struct)            Lattice struct containing the lattice paramaters (Lm, LN, Nt, a, dim_sub, D)
+Output: 
+    V   (matrix of lat.dim_sub*2 x lat.dim_sub*2)   The potential matrix of the hexagonal lattice for coulomb potential
 
 """
 function coulomb_potential(par::Parameters, lat::Lattice)
@@ -24,7 +32,16 @@ function coulomb_potential(par::Parameters, lat::Lattice)
 end 
 
 """
+Function for the Hubbard potential with self interations.
+We use Gaussian system of electromagnetic units.
 
+Input:
+    par (Paramaters struct)         Paramaters struct containing the run paramaters (α, β etc.)
+    lat (Lattice struct)            Lattice struct containing the lattice paramaters (Lm, LN, Nt, a, dim_sub, D)
+Optional: 
+    self_interaction (Float)        THe self interaction on the lattice sites (default =9.3 eV)
+Output: 
+    V   (matrix of lat.dim_sub*2 x lat.dim_sub*2)   The potential matrix of the hexagonal lattice for Hubbard potential
 """
 function hubbard_potential(par::Parameters, lat::Lattice; self_interaction=9.3)
         return Diagonal(ones(lat.dim_sub*2).*self_interaction)
@@ -32,6 +49,16 @@ end
 
 
 """
+Function for the partially screened coulomb potential (∝ 1/r) between the particles on the hexagonal matrix.
+We use Gaussian system of electromagnetic units.
+The first 4 interactions points are taken from [arXiv:1101.4007] and the next are from [DOI: 10.1103/PhysRevB.89.195429] 
+
+Input:
+    Rij (Float)                     THe interatomic lattice spacing beteween particle i and j
+    par (Paramaters struct)         Paramaters struct containing the run paramaters (α, β etc.)
+    lat (Lattice struct)            Lattice struct containing the lattice paramaters (Lm, LN, Nt, a, dim_sub, D)
+Output: 
+    V   (Float)                     The potential value for distance Rij
 
 """
 function partialScreenedCoulomb(Rij, par::Parameters, lat::Lattice)
@@ -66,6 +93,14 @@ function partialScreenedCoulomb(Rij, par::Parameters, lat::Lattice)
 end
 
 """
+Function for the partially screened coulomb potential (∝ 1/r) between the particles on the hexagonal matrix.
+We use Gaussian system of electromagnetic units.
+The first 4 interactions points are taken from [arXiv:1101.4007] and the next are from [DOI: 10.1103/PhysRevB.89.195429] 
+Input:
+    par (Paramaters struct)         Paramaters struct containing the run paramaters (α, β etc.)
+    lat (Lattice struct)            Lattice struct containing the lattice paramaters (Lm, LN, Nt, a, dim_sub, D)
+Output: 
+    V   (matrix of lat.dim_sub*2 x lat.dim_sub*2)   The potential matrix of the hexagonal lattice for partially screened coulomb potential
 
 """
 function partialScreenedCoulomb_potential(par::Parameters, lat::Lattice)
@@ -76,6 +111,16 @@ function partialScreenedCoulomb_potential(par::Parameters, lat::Lattice)
 end 
 
 """
+Function for the short screened coulomb potential (∝ 1/r) between the particles on the hexagonal matrix.
+We use Gaussian system of electromagnetic units.
+The first 4 interactions points are taken from CRPA [arXiv:1101.4007] and the next are a scaled form of 1/r which matches 
+to the CRPA value at r=2a
+Input:
+    Rij (Float)                     THe interatomic lattice spacing beteween particle i and j
+    par (Paramaters struct)         Paramaters struct containing the run paramaters (α, β etc.)
+    lat (Lattice struct)            Lattice struct containing the lattice paramaters (Lm, LN, Nt, a, dim_sub, D)
+Output: 
+    V   (Float)   The potential matrix of the hexagonal lattice for partially screened coulomb potential
 
 """
 function shortScreenedCoulomb(Rij, par::Parameters, lat::Lattice)
@@ -101,6 +146,15 @@ function shortScreenedCoulomb(Rij, par::Parameters, lat::Lattice)
 end
 
 """
+Function for the short screened coulomb potential (∝ 1/r) between the particles on the hexagonal matrix.
+We use Gaussian system of electromagnetic units.
+The first 4 interactions points are taken from CRPA [arXiv:1101.4007] and the next are a scaled form of 1/r which matches 
+to the CRPA value at r=2a
+Input:
+    par (Paramaters struct)         Paramaters struct containing the run paramaters (α, β etc.)
+    lat (Lattice struct)            Lattice struct containing the lattice paramaters (Lm, LN, Nt, a, dim_sub, D)
+Output: 
+    V   (matrix of lat.dim_sub*2 x lat.dim_sub*2)   The potential matrix of the hexagonal lattice for partially screened coulomb potential
 
 """
 function shortScreenedCoulomb_potential(par::Parameters, lat::Lattice)
