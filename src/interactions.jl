@@ -113,7 +113,7 @@ end
 """
 Function for the short screened coulomb potential (∝ 1/r) between the particles on the hexagonal matrix.
 We use Gaussian system of electromagnetic units.
-The first 4 interactions points are taken from CRPA [arXiv:1101.4007] and the next are a scaled form of 1/r which matches 
+The first 4 interactions points are taken from CRPA [arXiv:1101.4007] and the next are a scaled form of 1/r which matches [http://arxiv.org/abs/1511.04918]
 to the CRPA value at r=2a
 Input:
     Rij (Float)                     THe interatomic lattice spacing beteween particle i and j
@@ -148,7 +148,7 @@ end
 """
 Function for the short screened coulomb potential (∝ 1/r) between the particles on the hexagonal matrix.
 We use Gaussian system of electromagnetic units.
-The first 4 interactions points are taken from CRPA [arXiv:1101.4007] and the next are a scaled form of 1/r which matches 
+The first 4 interactions points are taken from CRPA [arXiv:1101.4007] and the next are a scaled form of 1/r which matches [http://arxiv.org/abs/1511.04918]
 to the CRPA value at r=2a
 Input:
     par (Paramaters struct)         Paramaters struct containing the run paramaters (α, β etc.)
