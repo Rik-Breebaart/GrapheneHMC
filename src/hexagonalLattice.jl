@@ -22,10 +22,22 @@ mutable struct Lattice
 end 
 
 # automatically compute the lattice dimension when the struct is created.
+# set a to 0.71*10^(-3) eV-1 which is equvilant to 1.42 Å
 Lattice(Lm,Ln,Nt) = Lattice(Lm,Ln,Nt,0.71*10^(-3))
-Lattice(Lm,Ln,Nt,a) = Lattice(Lm,Ln,Nt,a,Lm*Ln)
+# set dimension of the sublatice to Lm*Ln
+Lattice(Lm,Ln,Nt,a) = Lattice(Lm,Ln,Nt,a,m*Ln)
+# set the total dimension D = 2*dim_sub*Nt
 Lattice(Lm,Ln,Nt,a,dim_sub) = Lattice(Lm,Ln,Nt,a,dim_sub,dim_sub*2*Nt)
 
+"""
+Function to change the lattice struct mutable struct.
+
+Input:
+    lat (Lattice struct)      The lattice struct contianing the lattice parameters
+    Lm (int)                  The m length of the graphene lattice grid (horizontal length)
+    Ln (int)                  The n length of the graphene lattice grid (vertical length)
+    Nt (int)                  The number time steps 
+"""
 function change_lat(lat::Lattice; Nt= 0, Lm=0, Ln=0)
     if Nt!==0
         lat.Nt = Nt
@@ -40,6 +52,15 @@ function change_lat(lat::Lattice; Nt= 0, Lm=0, Ln=0)
     lat.dim_sub = lat.Lm*lat.Ln
 end 
 
+"""
+Particle struct indicating the index coordinates of a particle.
+
+Input: 
+    m (Int)     The Lm direction index on the sublattice
+    n (Int)     The Ln direction index on the sublattice
+    Pab (int (either 0 or 1)) The boolean index indicating whether the particle is on sublattice A or B (indicated by 0 or 1 respectively)
+    start       The indication on how the indices are store (starting with either 0 or 1 as the first index)
+"""
 struct Particle
     m::Int
     n::Int
@@ -47,12 +68,35 @@ struct Particle
     start::Int
 end 
 
+#set the default start to 0
 Particle(m, n, Pab) = Particle(m, n, Pab, 0) 
 
+"""
+Function to determine the particle position in real space.
+
+Input: 
+    particle (Particle struct)      The particle struct indicating which particles position to determine (struct contains m,n,Pab and start)
+    lat (Lattice struct)            The lattice struct contianing the lattice parameters
+Output:
+    coordinate (2D Float)           The coordinates of the given particle
+"""
 function particle_position(particle::Particle, lat::Lattice)
     return particle_position(particle.m, particle.n, particle.Pab, lat, start=particle.start)
 end 
 
+"""
+Function to determine the particle position in real space.
+
+Input: 
+    m (Int)     The Lm direction index on the sublattice
+    n (Int)     The Ln direction index on the sublattice
+    Pab (int (either 0 or 1)) The boolean index indicating whether the particle is on sublattice A or B (indicated by 0 or 1 respectively)
+    lat (Lattice struct)            The lattice struct contianing the lattice parameters
+Optional: 
+    start       The indication on how the indices are store (starting with either 0 or 1 as the first index)(default=0)
+Output:
+    coordinate (2D Float)           The coordinates of the given particle
+"""
 function particle_position(m, n, Pab, lat::Lattice; start=0)
     bas1 = [sqrt(3)/2,0]
     bas2 = [0,1/2]
@@ -131,7 +175,16 @@ function neighbour_matrix(lat::Lattice)
     return A + A'
 end 
 
+"""
+Function to determine the coordinates of the neighbour of particle at position x on sublattice Pab.
 
+Input:
+    x (2 Floats)    The coordinates of the particle
+    Pab (Bool)              The boolean indicator on which lattice we are if Pab=0 then sublatice A elseif Pab=1 on sublatice B
+    lat (Lattice struct)    The lattice struct contianing the lattice parameters
+Output:
+    Neighbours (3,2 floats) The real space coordinates of the three graphene neighbours.
+"""
 function neighbours_x(x, Pab, lat::Lattice)
     bas1 = [1,0]
     bas2 = [0,1]
