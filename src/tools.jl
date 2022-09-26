@@ -296,3 +296,31 @@ function CreateFigure(y, Folder, Filename,;y_err=nothing, fmt=".", x_label=nothi
 end        
 
 
+
+function storage_folder(observable, equation, par::Parameters, lat::Lattice)
+    folder = string(observable,"_eq",equation,"_beta_",floor(Integer,par.β*10),"Lm_",lat.Lm,"Ln_",lat.Ln,"Nt_",lat.Nt)
+    S_folder_set(runNumber) = abspath(@__DIR__,string("../results/",folder,"_",runNumber))
+    #create new folder if folder already exists
+    runNumber = 0
+    if isdir(S_folder_set(runNumber))
+        while isdir(S_folder_set(runNumber))
+            runNumber +=1 
+        end        
+    end
+    mkdir(S_folder_set(runNumber))
+    return string(folder,"_",runNumber)
+end 
+
+function storage_folder(observable, equation, β, lat::Lattice)
+    folder = string(observable,"_eq",equation,"_beta_",floor(Integer,β*10),"Lm_",lat.Lm,"Ln_",lat.Ln,"Nt_",lat.Nt)
+    S_folder_set(runNumber) = abspath(@__DIR__,string("../results/",folder,"_",runNumber))
+    #create new folder if folder already exists
+    runNumber = 0
+    if isdir(S_folder_set(runNumber))
+        while isdir(S_folder_set(runNumber))
+            runNumber +=1 
+        end        
+    end
+    mkdir(S_folder_set(runNumber))
+    return string(folder,"_",runNumber)
+end 

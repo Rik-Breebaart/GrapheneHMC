@@ -15,10 +15,10 @@ include(abspath(@__DIR__, "../src/tools.jl"))
 
 
 α = 1.87
-par = Parameters(2.0, 0.5, 2.2/α, 0.5)
+par = Parameters(2.0, 0.3, (300/137)/α, 0.5)
 Nts = [8,12,16,20,24]
 Δn_array = zeros((length(Nts)[1],2))
-lat = Lattice(2, 2, 1)
+lat = Lattice(6, 6, 1)
 
 for i = 1:length(Nts)[1]
     change_lat(lat, Nt = Nts[i])
@@ -43,20 +43,22 @@ for i = 1:length(Nts)[1]
     plot(res_Δn)
     xlabel("sweeps")
     ylabel(L"$\Delta n$")
-    savefig(abspath(@__DIR__,string("../plots/SublatticeSpin_hmc_thermilization_41_continues_",lat.Lm,"_",lat.Ln,"_",lat.Nt)))
+    title(string(L"$\beta$ = ", par.β ,L"$\alpha $= ",(300/137)/par.ϵ, " m = ", par.mass))
+    savefig(abspath(@__DIR__,string("../plots/SublatticeSpin_hmc_thermilization_41_continues_mass_",floor(Integer, par.mass*10),"_",lat.Lm,"_",lat.Ln,"_",lat.Nt)))
     Δn_array[i,1] = mean(res_Δn)
     Δn_array[i,2] = std(res_Δn)
 end
 
 clf()
-Nts_x = -0.05:0.01:((1/8)+0.05)
+Nts_x = 0.0:0.01:((1/8)+0.05)
 
 errorbar(1 ./Nts, Δn_array[:,1],yerr=Δn_array[:,2],fmt="o")
 fit = curve_fit(Polynomial, 1 ./Nts, Δn_array[:,1], 1)
 y0b = fit.(Nts_x) 
-plot(Nts_x, y0b, "--", linewidth=1)
-ylabel("1/Nt")
-xlabel(L"$\langle \Delta n \rangle")
-xlim([-0.05, (1/8)+0.05])
+plot(Nts_x, y0b, "--", linewidth=1,)
+xlabel("1/Nt")
+ylabel(L"$\langle \Delta n \rangle$")
+title(string(L"$\beta$ = ", par.β ,L"$\alpha $= ",(300/137)/par.ϵ, " m = ", par.mass))
+xlim([0.0, (1/8)+0.05])
 grid()
-savefig(abspath(@__DIR__,string("../plots/SublatticeSpin_hmc_thermilization_41_continues_",lat.Lm,"_",lat.Ln,".png")))
+savefig(abspath(@__DIR__,string("../plots/SublatticeSpin_hmc_thermilization_41_continues_mass_",floor(Integer,par.mass*10),"_",lat.Lm,"_",lat.Ln,".png")))
