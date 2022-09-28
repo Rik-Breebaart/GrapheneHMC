@@ -15,19 +15,21 @@ include(abspath(@__DIR__, "../src/tools.jl"))
 
 
 α = 1.87
-par = Parameters(2.0, 0.5, (300/137)/α, 0.5)
+mass = 0.5
+par = Parameters(2.0, mass, (300/137)/α, 0.5)
 path_length = 10.0
 step_size = 0.5
-m = 10
-Nsamples= 1000
-burn_in = 100
-offset = floor(Integer, 0.5*Nsamples)
+m = 5
+Nsamples= 2000
+burn_in = 0
+offset = floor(Integer, 0.3*Nsamples)
 
-Nts = [4, 8, 10, 12, 16]
+Nts = [8, 10, 12, 16]
 Δn_array = zeros((length(Nts)[1],2))
 lat = Lattice(4, 4, 1)
 
 folder = storage_folder("Themporal_Continuem", "41", par, lat)
+
 sub_folder = storage_folder(string(folder,"/storage_intermediate"),"41",par,lat)
 
 for i = 1:length(Nts)[1]
@@ -55,7 +57,7 @@ for i = 1:length(Nts)[1]
     Δn_M = mean(res_Δn[offset:end])
     Δn2_M = mean(res_Δn[offset:end].^2)
     # err_Δn_M = std(res_Δn[offset:end])
-    err_Δn_M = sqrt(Δn2_M-Δn_M^2/(Nsamples-offset-1))
+    err_Δn_M = sqrt((Δn2_M-Δn_M^2)/(Nsamples-offset-1))
     Δn_array[i,1] = Δn_M
     Δn_array[i,2] = err_Δn_M
     StoreResult(string(sub_folder,"/SublatticeSpin_interacting_eq41_m_",floor(Integer,par.mass*10),"_alpha_",floor(Int,((300/137)/par.ϵ)*10),"_Nt_",lat.Nt), res_Δn)
@@ -76,7 +78,7 @@ y0b = fit.(Nts_x)
 plot(Nts_x, y0b, "--", linewidth=1,)
 xlabel("1/Nt")
 ylabel(L"$\langle \Delta n \rangle$")
-title(string(L"$\beta$ = ", par.β ,L"$\alpha $= ",(300/137)/par.ϵ, " m = ", par.mass))
+title(string(L"$\beta$ = ", par.β ,L"$\alpha $= ",round((300/137)/par.ϵ,digits=2), " m = ", par.mass))
 xlim([0.0, (1/8)+0.05])
 grid()
 savefig(abspath(@__DIR__,string("../results/",folder,"/SublatticeSpin_hmc_thermilization_41_continues_mass_",floor(Integer,par.mass*10),"_",lat.Lm,"_",lat.Ln,".png")))

@@ -16,18 +16,18 @@ include(abspath(@__DIR__, "../src/interactions.jl"))
 include(abspath(@__DIR__, "../src/actionComponents.jl"))
 
 #set configuration settings
-lat = Lattice(4, 4, 12)
+lat = Lattice(2, 2, 8)
 ms = [0.5, 0.4, 0.3, 0.2, 0.1]
-ϵs = LinRange(0.45, 2.5, 21)
-αs = (300/137)./ϵs
+αs = LinRange(0.1, 5.0, 21)
+ϵs = (300/137)./αs
 rng = MersenneTwister(123)
 
 path_length = 10.0
 step_size = 1.0
 m = 10  #sexton weingarten split Fermionic substeps
-Nsamples= 500
+Nsamples= 10000
 burn_in = 100
-offset = floor(Integer, Nsamples*0.3)
+offset = floor(Integer, Nsamples*0.15)
 
 β = 2.0
 
@@ -71,7 +71,7 @@ for i in 1:length(ms)[1]
             Δn_M = mean(res_Δn[offset:end])
             Δn2_M = mean(res_Δn[offset:end].^2)
             # err_Δn_M = std(res_Δn[offset:end])
-            err_Δn_M = sqrt(Δn2_M-Δn_M^2/(Nsamples-offset-1))
+            err_Δn_M = sqrt((Δn2_M-Δn_M^2)/(Nsamples-offset-1))
             Δn_array[i,j,1] = Δn_M
             Δn_array[i,j,2] = err_Δn_M
         end 
@@ -80,6 +80,7 @@ for i in 1:length(ms)[1]
     CreateFigure(αs, Δn_array[i,:,1], folder,string("SublatticeSpin_interacting_eq41_m_",floor(Integer,ms[i]*10)), 
                 y_err = Δn_array[i,:,2] ,x_label=L"$\alpha_{eff}$", y_label=L"$\langle \Delta n \rangle$", 
                 figure_title=string(L"$\Delta n$ for m = ",ms[i]))
+    global burn_in=0
 end
 
  

@@ -37,7 +37,7 @@ for i = 1:length(Nts)[1]
     Δn_M = mean(res_Δn[offset:end])
     Δn2_M = mean(res_Δn[offset:end].^2)
     # err_Δn_M = std(res_Δn[offset:end])
-    err_Δn_M = sqrt(Δn2_M-Δn_M^2/(Nsamples-offset-1))
+    err_Δn_M = sqrt((Δn2_M-Δn_M^2)/(Nsamples-offset-1))
     Δn_array[i,1] = Δn_M
     Δn_array[i,2] = err_Δn_M
 end
@@ -51,7 +51,7 @@ y0b = fit.(Nts_x)
 plot(Nts_x, y0b, "--", linewidth=1,)
 xlabel("1/Nt")
 ylabel(L"$\langle \Delta n \rangle$")
-title(string(L"$\beta$ = ", par.β ,L"$\alpha $= ",(300/137)/par.ϵ, " m = ", par.mass))
+title(string(L"$\beta$ = ", par.β ,L" $\alpha $= ",round((300/137)/par.ϵ,digits=2), " m = ", par.mass))
 xlim([0.0, (1/8)+0.05])
 grid()
 savefig(abspath(@__DIR__,string("../results/",folder,"/SublatticeSpin_hmc_thermilization_41_continues_mass_",floor(Integer,par.mass*10),"_",lat.Lm,"_",lat.Ln,".png")))

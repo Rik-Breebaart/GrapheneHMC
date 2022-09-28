@@ -235,17 +235,23 @@ function HybridMonteCarlo(S::Function, ∇S::Function, M_function::Function, D::
             @show real(ΔH)
         end
         #step 3B: perform metropolis check
-        if randU[i] > exp(-real(ΔH)) && i > burn_in
-            nreject += 1
-            ϕ = ϕ_old
-        else
-            ϕ = ϕ_trial
-            if print_accept==true
-                if i > burn_in
+        if i > burn_in
+            if randU[i] > exp(-real(ΔH)) 
+                nreject += 1
+                ϕ = ϕ_old
+            else
+                ϕ = ϕ_trial
+                if print_accept==true
                     println("Accepted ",i-nreject-burn_in)
-                else 
-                    println("Accepted burn in",i-nreject-burn_in)
                 end
+            end
+        else
+            if abs(real(ΔH)) <100
+                ϕ = ϕ_trial
+                println("Accepted burn in",i-nreject-burn_in)
+            else 
+                nreject +=1
+                ϕ = ϕ_old
             end
         end
         configurations[i,:] = ϕ
@@ -330,17 +336,23 @@ function HybridMonteCarlo(S::Function, ∇S_V::Function, ∇S_M::Function, M_fun
             @show real(ΔH)
         end
         #step 3B: perform metropolis check
-        if randU[i] > exp(-real(ΔH)) && i > burn_in
-            nreject += 1
-            ϕ = ϕ_old
-        else
-            ϕ = ϕ_trial
-            if print_accept==true
-                if i > burn_in
-                    println("Accepted ",i-nreject-burn_in)
-                else 
-                    println("Accepted burn in",i-nreject-burn_in)
+        if i > burn_in
+            if randU[i] > exp(-real(ΔH)) 
+                nreject += 1
+                ϕ = ϕ_old
+            else
+                ϕ = ϕ_trial
+                if print_accept==true
+                    println("Accepted ",i-nreject)
                 end
+            end
+        else
+            if abs(real(ΔH)) <100
+                ϕ = ϕ_trial
+                println("Accepted burn in",i-nreject)
+            else 
+                nreject +=1
+                ϕ = ϕ_old
             end
         end
         configurations[i,:] = ϕ
