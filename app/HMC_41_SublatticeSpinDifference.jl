@@ -16,14 +16,15 @@ include(abspath(@__DIR__, "../src/interactions.jl"))
 include(abspath(@__DIR__, "../src/actionComponents.jl"))
 
 #set configuration settings
-lat = Lattice(6, 6, 16)
+lat = Lattice(4, 4, 12)
 ms = [0.5, 0.4, 0.3, 0.2, 0.1]
-ϵs = LinRange(0.45, 2.2, 8)
+ϵs = LinRange(0.45, 2.5, 21)
 αs = (300/137)./ϵs
 rng = MersenneTwister(123)
 
 path_length = 10.0
-step_size = 0.05
+step_size = 1.0
+m = 10  #sexton weingarten split Fermionic substeps
 Nsamples= 500
 β = 2.0
 
@@ -53,10 +54,11 @@ for i in 1:length(ms)[1]
             M_function(ϕ) = FermionicMatrix_int_41_phi_part(ϕ, M_part, par, lat)
             # M_function(ϕ) = FermionicMatrix_int_41(ϕ, V, par, lat)
             S(ϕ, χ) = Action_V_cg(ϕ, V, par ,lat) + Action_M_cg(χ, M_function(ϕ), par ,lat)
-            ∇S(ϕ, χ) = ∇S_V_cg(ϕ, V, par, lat)+∇S_M_eq41_cg(ϕ, χ, M_function(ϕ), par, lat)
+            ∇S_V(ϕ, χ) = ∇S_V_cg(ϕ, V, par, lat)
+            ∇S_M(ϕ, χ) = ∇S_M_eq41_cg(ϕ, χ, M_function(ϕ), par, lat)
             D = lat.D
 
-            configurations, nreject = HybridMonteCarlo(S::Function, ∇S::Function, M_function::Function, D::Integer, path_length, step_size, Nsamples::Integer; rng=rng, position_init=ϕ_init, print_time=true, print_accept=true)
+            configurations, nreject = HybridMonteCarlo(S, ∇S_V, ∇S_M, M_function, D, path_length, step_size, m, Nsamples; rng=rng, position_init=ϕ_init, print_time=true, print_accept=true)
             ϕ_init = configurations[end,:]
             println((Nsamples-nreject)/Nsamples, " percent for m=",ms[i], " and α=",(300/137)/ϵs[j])
             res_Δn = [Δn(M_function(configurations[i,:]), par, lat) for i in 1:Nsamples]
@@ -65,7 +67,9 @@ for i in 1:length(ms)[1]
             
             offset = floor(Integer, Nsamples*0.3)
             Δn_M = mean(res_Δn[offset:end])
-            err_Δn_M = std(res_Δn[offset:end])
+            Δn2_M = mean(res_Δn[offset:end].^2)
+            # err_Δn_M = std(res_Δn[offset:end])
+            err_Δn_M = sqrt(Δn2_M-Δn_M^2/(Nsamples-offset-1))
             Δn_array[i,j,1] = Δn_M
             Δn_array[i,j,2] = err_Δn_M
         end 
