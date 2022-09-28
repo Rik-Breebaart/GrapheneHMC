@@ -26,6 +26,9 @@ path_length = 10.0
 step_size = 1.0
 m = 10  #sexton weingarten split Fermionic substeps
 Nsamples= 500
+burn_in = 100
+offset = floor(Integer, Nsamples*0.3)
+
 β = 2.0
 
 
@@ -58,14 +61,13 @@ for i in 1:length(ms)[1]
             ∇S_M(ϕ, χ) = ∇S_M_eq41_cg(ϕ, χ, M_function(ϕ), par, lat)
             D = lat.D
 
-            configurations, nreject = HybridMonteCarlo(S, ∇S_V, ∇S_M, M_function, D, path_length, step_size, m, Nsamples; rng=rng, position_init=ϕ_init, print_time=true, print_accept=true)
+            configurations, nreject = HybridMonteCarlo(S, ∇S_V, ∇S_M, M_function, D, path_length, step_size, m, Nsamples; rng=rng, position_init=ϕ_init, print_time=true, print_accept=true, burn_in=burn_in)
             ϕ_init = configurations[end,:]
             println((Nsamples-nreject)/Nsamples, " percent for m=",ms[i], " and α=",(300/137)/ϵs[j])
             res_Δn = [Δn(M_function(configurations[i,:]), par, lat) for i in 1:Nsamples]
             StoreResult(string(sub_folder,"/SublatticeSpin_interacting_eq41_m_",floor(Integer,ms[i]*10),"_alpha_",floor(Int,((300/137)/ϵs[j])*10)), res_Δn)
             CreateFigure(res_Δn, sub_folder,string("SublatticeSpin_interacting_eq41_m_",floor(Integer,ms[i]*10),"_alpha_",floor(Int,((300/137)/ϵs[j])*10)),x_label="sample", y_label=L"$\Delta n$", fmt="-", figure_title=string(L"$\Delta n$ for m = ",ms[i], L" and $\alpha_{eff}$ = ", (300/137)/ϵs[j]))
             
-            offset = floor(Integer, Nsamples*0.3)
             Δn_M = mean(res_Δn[offset:end])
             Δn2_M = mean(res_Δn[offset:end].^2)
             # err_Δn_M = std(res_Δn[offset:end])

@@ -23,9 +23,9 @@ Nsamples= 1000
 burn_in = 100
 offset = floor(Integer, 0.5*Nsamples)
 
-Nts = [8,12,16,20,24]
+Nts = [4, 8, 10, 12, 16]
 Δn_array = zeros((length(Nts)[1],2))
-lat = Lattice(2, 2, 1)
+lat = Lattice(4, 4, 1)
 
 folder = storage_folder("Themporal_Continuem", "41", par, lat)
 sub_folder = storage_folder(string(folder,"/storage_intermediate"),"41",par,lat)
@@ -46,7 +46,7 @@ for i = 1:length(Nts)[1]
     ϕ_init = ones(lat.D)*140
 
     configurations, nreject = HybridMonteCarlo(S, ∇S_V, ∇S_M, M_function, D, path_length, step_size, m, 
-                                                Nsamples; rng=rng, position_init=ϕ_init, print_H=true, burn_in=100)
+                                                Nsamples; rng=rng, position_init=ϕ_init, print_H=true, burn_in=burn_in)
     @show (Nsamples-nreject)/Nsamples
 
     res_Δn = [Δn(M_function(configurations[i,:]), par, lat) for i in 1:Nsamples]
