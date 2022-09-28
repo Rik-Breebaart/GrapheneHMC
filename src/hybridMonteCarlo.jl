@@ -192,7 +192,9 @@ Output:
     conf    (Nsample X n float) The obtained Nsample configurations of the discretized field
     nreject  (Integer)      The nunber of rejections before reaching the Nsample configurations
 """
-function HybridMonteCarlo(S::Function, ∇S::Function, M_function::Function, D::Integer, path_length, step_size, Nsamples::Integer; rng=MersenneTwister(), position_init=1.0, print_time=true, print_accept=true, print_H=false)
+function HybridMonteCarlo(S::Function, ∇S::Function, M_function::Function, D::Integer, path_length, step_size,
+                        Nsamples::Integer; rng=MersenneTwister(), position_init=1.0, 
+                        print_time=true, print_accept=true, print_H=false, burn_in = 0)
     #set up empty memory for the position and 
     if length(position_init)[1] == 1
         ϕ = (2*rand(rng,D).-1).*position_init
@@ -230,16 +232,20 @@ function HybridMonteCarlo(S::Function, ∇S::Function, M_function::Function, D::
         #step 3A: compute the energy difference for Metropolis-Hastings check
         ΔH = H_final-H_init
         if print_H==true
-            @show ΔH
+            @show real(ΔH)
         end
         #step 3B: perform metropolis check
-        if randU[i] > exp(-real(ΔH))
+        if randU[i] > exp(-real(ΔH)) && i > burn_in
             nreject += 1
             ϕ = ϕ_old
         else
             ϕ = ϕ_trial
             if print_accept==true
-                println("Accepted ",i-nreject)
+                if i > burn_in
+                    println("Accepted ",i-nreject-burn_in)
+                else 
+                    println("Accepted burn in",i-nreject-burn_in)
+                end
             end
         end
         configurations[i,:] = ϕ
@@ -253,3 +259,97 @@ function HybridMonteCarlo(S::Function, ∇S::Function, M_function::Function, D::
     return configurations, nreject
 end 
 
+"""
+Metropolis Hatings monte carlo for graphene
+with the fields changed to reflect those in the paper (10.1103/PhysRevB.89.195429)
+The hybrid monte caro performs the following steps:
+step 0: initialize the system
+step 1: sample the momentum 
+step 2: Perform the hamiltonian monte carlo by using an integrator
+step 3: compare the difference between the hamiltonian before and after the integration scheme and keep based on metropolis acceptance
+
+Input: 
+    S       (function)      The function corresponding to the action of the system
+    ∇S      (function)      The funtion corresponding to the derivative of the action
+    M_funciton (function)   Function which creates the fermionic matrix
+    D       (Integer)       The dimensions of the field (space X time)
+    path_length (Float)     The path length of the integration scheme
+    step_size  (Float)      The size of the steps in the integration
+    Nsample (Integer)       The number of samples obtained using the montecarlo scheme (all the accepted cases)
+Optional:
+    rng                     The Random number generator used (if not provided MersenneTwister() is used)
+    position_init  (Vector of D Floats or single float)         The initial value of the position field from which the hamiltonian dynamics starts (default: 1.0)
+    print_time     (bool)   Indicates wheter the run time of single sample is printed (default=true)
+    print_accept   (bool)   Indicates wheter the acceptance of single sample is printed (default=true)      
+    print_H=false  (bool)   Indicates whether the hamiltonian difference is printed after each integration (default=false)
+Output:
+    conf    (Nsample X n float) The obtained Nsample configurations of the discretized field
+    nreject  (Integer)      The nunber of rejections before reaching the Nsample configurations
+"""
+function HybridMonteCarlo(S::Function, ∇S_V::Function, ∇S_M::Function, M_function::Function, D::Integer, path_length, step_size, m::Integer, 
+                        Nsamples::Integer; rng=MersenneTwister(), position_init=1.0, 
+                        print_time=true, print_accept=true, print_H=false, burn_in = 0)
+    #set up empty memory for the position and 
+    if length(position_init)[1] == 1
+        ϕ = (2*rand(rng,D).-1).*position_init
+    elseif length(position_init)[1]>1
+        ϕ = position_init
+    else 
+        error("incorrect initial position is given")
+    end 
+    configurations = zeros(Nsamples,D)
+    randU = rand(rng,Float64,(Nsamples))
+    randρ = randn(rng,ComplexF64, (Nsamples,D))
+
+    #count the rejections
+    nreject = 0
+    dpdt(π) = π
+    #compute Nsamples different configurations
+    for i =1:Nsamples
+        if  print_time==true
+            println("start ",i)
+            starttime = time()
+        end
+        #step 1: Compute random momentum from gaussian distribution with weight momentum_mass
+        π = rand(rng, Normal(),D)
+        ϕ_old = copy(ϕ)
+        M = M_function(ϕ)
+        χ = M*randρ[i,:]
+        dqdt_V(ϕ) = -∇S_V(ϕ, χ)
+        dqdt_M(ϕ) = -∇S_M(ϕ, χ)
+        #step 2A: compute the original hamiltonian energy
+        H_init = 0.5*sum(π.^2) + S(ϕ, χ)
+        #step 2B: perform the molecular dynamics using the prescribed integrator
+        ϕ_trial, π = SextonWeingartenIntegrator(path_length, step_size, ϕ, π, dqdt_V, dqdt_M, m)
+        #step 2C: compute the final hamiltonian energy
+        H_final = 0.5*sum(π.^2) + S(ϕ_trial, χ)
+
+        #step 3A: compute the energy difference for Metropolis-Hastings check
+        ΔH = H_final-H_init
+        if print_H==true
+            @show real(ΔH)
+        end
+        #step 3B: perform metropolis check
+        if randU[i] > exp(-real(ΔH)) && i > burn_in
+            nreject += 1
+            ϕ = ϕ_old
+        else
+            ϕ = ϕ_trial
+            if print_accept==true
+                if i > burn_in
+                    println("Accepted ",i-nreject-burn_in)
+                else 
+                    println("Accepted burn in",i-nreject-burn_in)
+                end
+            end
+        end
+        configurations[i,:] = ϕ
+
+        if  print_time==true            
+            endtime = time()
+            println("end! time: ",endtime-starttime)
+        end
+    end
+    # return the final configurations and the number of rejections.
+    return configurations, nreject
+end 
