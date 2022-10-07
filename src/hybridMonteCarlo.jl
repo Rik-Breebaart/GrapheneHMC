@@ -5,6 +5,37 @@ This file will contain the implementation for hybrid monte carlo in a general ma
 using Random, Random.DSFMT, Distributions, LinearAlgebra
 include("integrators.jl")
 
+mutable struct HMC_Parameters
+    Nsamples::Integer
+    path_length::Float64
+    step_size::Float64
+    offset::Integer
+    m_sw::Integer
+    burn_in::Integer
+end 
+
+function HMC_LeapFrog_default(Nsamples)
+    offset = floor(Integer, 0.3*Nsamples)
+    if Nsamples <400
+        burn_in = floor(Integer, 0.25*Nsamples)
+    else 
+        burn_in = 100
+    end
+    return HMC_Parameters(Nsamples, 10.0, 0.05, offset, 1, burn_in)
+end
+
+function HMC_SW_default(Nsamples; step_size=0.5, m_sw = 5, path_length=10.0)
+    offset = floor(Integer, 0.3*Nsamples)
+    if Nsamples <400
+        burn_in = floor(Integer, 0.25*Nsamples)
+    else 
+        burn_in = 100
+    end
+    return HMC_Parameters(Nsamples, path_length, step_size, offset, m_sw, burn_in)
+end
+
+
+
 """
 Hybrid monte carlo following the code from https://gist.github.com/Shoichiro-Tsutsui/53eb534f6794e1eece55b1d5a7c118fe 
 with the fields changed to reflect those in the paper (10.1103/PhysRevB.89.195429)
@@ -326,7 +357,11 @@ function HybridMonteCarlo(S::Function, ∇S_V::Function, ∇S_M::Function, M_fun
         #step 2A: compute the original hamiltonian energy
         H_init = 0.5*sum(π.^2) + S(ϕ, χ)
         #step 2B: perform the molecular dynamics using the prescribed integrator
-        ϕ_trial, π = SextonWeingartenIntegrator(path_length, step_size, ϕ, π, dqdt_V, dqdt_M, m)
+        if i<burn_in
+            ϕ_trial, π = SextonWeingartenIntegrator(path_length, step_size/5, ϕ, π, dqdt_V, dqdt_M, m)
+        else 
+            ϕ_trial, π = SextonWeingartenIntegrator(path_length, step_size, ϕ, π, dqdt_V, dqdt_M, m)
+        end
         #step 2C: compute the final hamiltonian energy
         H_final = 0.5*sum(π.^2) + S(ϕ_trial, χ)
 
@@ -349,7 +384,7 @@ function HybridMonteCarlo(S::Function, ∇S_V::Function, ∇S_M::Function, M_fun
         else
             if abs(real(ΔH)) <100
                 ϕ = ϕ_trial
-                println("Accepted burn in",i-nreject)
+                println("Accepted burn in ",i-nreject)
             else 
                 nreject +=1
                 ϕ = ϕ_old

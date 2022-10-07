@@ -1,5 +1,6 @@
 #=This script will contain al the general tools needed for the simulations=#
-using LinearAlgebra, PyPlot, Random, IterativeSolvers, DelimitedFiles
+using LinearAlgebra, PyPlot, Random, IterativeSolvers, DelimitedFiles, DataFrames, CSV
+include(abspath(@__DIR__, "../src/hybridMonteCarlo.jl"))
 
 struct Parameters
     β::Float64
@@ -164,36 +165,6 @@ function Trace_invD(D, dim; K=10, rng=MersenneTwister())
     return trace_invD/K
 end 
 
-"""
-Function to initialize a file and store the run paramaters. 
-The function creates a file according to filename containing the paramaters of the simulation. 
-This file can then be used to append the specific results to.
-
-Input: 
-    Filename (string + storage type (e.g. ".txt"))  The Filename with corresponding file type
-    lat     (Lattice struct)                        The lattice struct containing the lattice parameters
-    par     (Paramater struct)                      The paramater struct containing the fixed paramaters of the simulation (physical constants etc.)
-    method  (Optional, string:"w","a") Default: "w" Optional method string specifing the method for open (see https://docs.julialang.org/en/v1/base/io-network/ for specifc methods)
-
-"""
-function StoreConfigurationSettings(Filename, lat::Lattice, par::Parameters, HMC_par; method="w")
-    # Open file in append mode and then write to it
-    string = "Lm:\t$(lat.Lm)
-Ln:\t$(lat.Ln)
-Nt:\t$(lat.Nt)
-a:\t$(lat.a)
-D:\t$(lat.D)
-beta:\t$(par.β)
-kappa:\t$(par.κ)
-mass:\t$(par.mass)
-epsilon:\t$(par.ϵ)
-e2:\t$(par.e2)
-R0:\t$(par.R0)\n"
-    io = open(Filename,method)
-    write(io, string);
-    close(io);
-end 
-
 
 """
 Function to store results to a file.
@@ -323,4 +294,124 @@ function storage_folder(observable, equation, β, lat::Lattice)
     end
     mkdir(S_folder_set(runNumber))
     return string(folder,"_",runNumber)
+end 
+
+
+"""
+Function to initialize a file and store the run paramaters. 
+The function creates a file according to filename containing the paramaters of the simulation. 
+This file can then be used to append the specific results to.
+
+Input: 
+    Filename (string + storage type (e.g. ".txt"))  The Filename with corresponding file type
+    lat     (Lattice struct)                        The lattice struct containing the lattice parameters
+    par     (Paramater struct)                      The paramater struct containing the fixed paramaters of the simulation (physical constants etc.)
+    method  (Optional, string:"w","a") Default: "w" Optional method string specifing the method for open (see https://docs.julialang.org/en/v1/base/io-network/ for specifc methods)
+
+"""
+function Store_Settings(File_path, HMC_par::HMC_Parameters; method="w")
+    # store configuration settings in a file inside the desired folder
+    df = DataFrame(variable = ["Nsamples", "path_length", "step_size", "offset", "m_sw", "burn_in"], 
+                   value= [HMC_par.Nsamples, HMC_par.path_length, HMC_par.step_size, HMC_par.offset, HMC_par.m_sw, HMC_par.burn_in]
+                   )
+    if method=== "a"
+        append=true
+    else
+        append=false
+    end
+    CSV.write(File_path, df, append=append)
+end 
+
+function Store_Settings(File_path, lat::Lattice; method="w")
+    # store configuration settings in a file inside the desired folder
+    df = DataFrame(variable = ["Lm", "Ln", "Nt", "a"], 
+                   value= [lat.Lm, lat.Lm, lat.Nt, lat.a]
+                   )
+    if method=== "a"
+        append=true
+    else
+        append=false
+    end
+    CSV.write(File_path, df, append=append)
+end 
+
+function Store_Settings(File_path, par::Parameters; method="w")
+    # store configuration settings in a file inside the desired folder
+    df = DataFrame(variable = ["beta", "mass", "epsilon", "R0", "e2" , "kappa"], 
+                   value= [par.β, par.mass, par.ϵ, par.R0, par.e2, par.κ])
+    if method=== "a"
+        append=true
+    else
+        append=false
+    end
+    CSV.write(File_path, df, append=append)
+end 
+
+function par_from_df(df)
+    if "beta" in df.variable
+        par = Parameters(df[df.variable.=="beta",:].value[1], 
+                        df[df.variable.=="mass",:].value[1], 
+                        df[df.variable.=="epsilon",:].value[1], 
+                        df[df.variable.=="R0",:].value[1],
+                        df[df.variable.=="e2",:].value[1], 
+                        df[df.variable.=="kappa",:].value[1])
+        return par
+    else 
+        return nothing
+    end
+end
+
+function lat_from_df(df)
+    if "Lm" in df.variable
+        lat = Lattice(df[df.variable.=="Lm",:].value[1], 
+                        df[df.variable.=="Ln",:].value[1], 
+                        df[df.variable.=="Nt",:].value[1], 
+                        round(df[df.variable.=="a",:].value[1],digits=10))
+        return lat
+    else 
+        return nothing
+    end
+end
+
+function HMC_from_df(df)
+    if "Nsamples" in df.variable
+        HMC_par = HMC_Parameters(df[df.variable.=="Nsamples",:].value[1], 
+                        df[df.variable.=="path_length",:].value[1], 
+                        df[df.variable.=="step_size",:].value[1], 
+                        df[df.variable.=="offset",:].value[1],
+                        df[df.variable.=="m_sw",:].value[1], 
+                        df[df.variable.=="burn_in",:].value[1])
+        return HMC_par
+    else
+        return nothing
+    end
+end
+
+function Read_Settings(File_path)
+    df = CSV.read(File_path, DataFrame)   
+    return df 
+end
+
+function Read_Settings(File_path, structs)
+    df = CSV.read(File_path, DataFrame)   
+    a_lat = "lat" in structs
+    a_hmc = "hmc" in structs
+    a_par = "par" in structs
+    if a_hmc && a_lat && a_par
+        return lat_from_df(df), par_from_df(df), HMC_from_df(df)
+    elseif a_hmc && a_lat
+        return lat_from_df(df), HMC_from_df(df)
+    elseif a_hmc && a_par
+        return par_from_df(df), HMC_from_df(df)
+    elseif a_par && a_lat
+        return lat_from_df(df), par_from_df(df)
+    elseif a_hmc 
+        return HMC_from_df(df)
+    elseif a_lat
+        return lat_from_df(df)
+    elseif a_par
+        return par_from_df(df)
+    else 
+        error("Incorrect structs where provided should be either 'hmc', 'lat' or 'par' or a tuble of multiple of them.")
+    end
 end 

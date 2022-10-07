@@ -12,8 +12,8 @@ include(abspath(@__DIR__, "../src/observables.jl"))
 include(abspath(@__DIR__, "../src/tools.jl"))
 
 
-lat = Lattice(16, 16, 64)
-lat_analytic = Lattice(lat.Lm, lat.Ln, 64)
+lat = Lattice(12, 12, 28)
+lat_analytic = Lattice(lat.Lm, lat.Ln, 256)
 
 par = Parameters(2.0, 0.5, 1.0, 0.5)
 
@@ -41,22 +41,22 @@ for i=[1,2]
         legend()
         xlabel(L"time")
         ylabel(L"\langle G(τ,x,y) \rangle")
-        savefig(abspath(@__DIR__, string("../plots/G",name[i],name[j])))
+        savefig(abspath(@__DIR__, string("../plots/G_",lat.Lm,"_",lat.Ln,"_",lat.Nt,"_",name[i],name[j])))
     end 
 end
-check = zeros((2,2))
-for i=[1,2], j = [1,2]
-    check[i,j] = mean(real.(correlator[:,i,j])./real.(correlator_M[:,i,j]))
-end
-@show check
+# check = zeros((2,2))
+# for i=[1,2], j = [1,2]
+#     check[i,j] = mean(real.(correlator[:,i,j])./real.(correlator_M[:,i,j]))
+# end
+# @show check
 
 
 
 k_a = (2*pi)/(3*lat.a)* [sqrt(3),-1]
 k_b = (4*pi)/(3*lat.a)* [0,1]
 ks(m,n) = m/lat.Lm*k_a + n/lat.Ln * k_b
-correlator_momentum = greensFunctionGraphene_kspace(ks(1,1), par, lat_analytic)
-correlator_M_momentum = greens_function_kspace(M_no_int, ks(1,1), par, lat)
+correlator_momentum = greensFunctionGraphene_kspace(ks(int(lat.Lm/2),int(lat.Ln/2)), par, lat_analytic)
+correlator_M_momentum = greens_function_kspace(M_no_int, ks(int(lat.Lm/2),int(lat.Ln/2)), par, lat)
 for i=[1,2]
     for j = [1,2]
         clf()
@@ -70,15 +70,15 @@ for i=[1,2]
         legend()
         xlabel(L"time")
         ylabel(L"\langle G(τ,k) \rangle")
-        savefig(abspath(@__DIR__, string("../plots/G_k",name[i],name[j])))
+        savefig(abspath(@__DIR__, string("../plots/G_",lat.Lm,"_",lat.Ln,"_",lat.Nt,"_k",name[i],name[j])))
     end 
 end
 
-check = zeros((2,2))
-for i=[1,2], j = [1,2]
-    check[i,j] = mean(real.(correlator_momentum[:,i,j])./real.(correlator_M_momentum[:,i,j]))
-end
-@show check
+# check = zeros((2,2))
+# for i=[1,2], j = [1,2]
+#     check[i,j] = mean(real.(correlator_momentum[:,i,j])./real.(correlator_M_momentum[:,i,j]))
+# end
+# @show check
 
 
 
@@ -97,4 +97,4 @@ semilogy(τ_analytic, real.(c_min), "*", label=L"analytical G_{-}")
 legend()
 xlabel(L"time")
 ylabel(L"\langle G(τ,k) \rangle")
-savefig(abspath(@__DIR__, "../plots/G_plusMinus_k"))
+savefig(abspath(@__DIR__, string("../plots/G_plusMinus_k_",lat.Lm,"_",lat.Ln,"_",lat.Nt)))

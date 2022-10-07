@@ -12,7 +12,7 @@ include(abspath(@__DIR__, "../src/tools.jl"))
 
 
 α = 1.87
-par = Parameters(2.0, 0.3, (300/137)/α, 0.5)
+par = Parameters(2.0, 0.5, (300/137)/α, 0.5)
 path_length = 10.0
 step_size = 0.5
 m = 10
@@ -20,14 +20,14 @@ Nsamples= 1000
 burn_in = 100
 offset = floor(Integer, 0.5*Nsamples)
 
-Nts = [8,12,16,20,24]
+Nts = [8,10,12,16]
 Δn_array = zeros((length(Nts)[1],2))
-lat = Lattice(2, 2, 1)
+lat = Lattice(4, 4, 1)
 
-folder = "Themporal_Continuem_eq41_beta_20Lm_2Ln_2Nt_1_4"
-sub_folder = "storage_intermediate_eq41_beta_20Lm_2Ln_2Nt_1_0"
+folder = "Themporal_Continuem_eq41_beta_20Lm_4Ln_4Nt_1_6"
+sub_folder = "storage_intermediate_eq41_beta_20Lm_4Ln_4Nt_1_0"
 
-Filename(i) = string(folder,"/",sub_folder,"/SublatticeSpin_interacting_eq41_m_3_alpha_18_Nt_",i)
+Filename(i) = string(folder,"/",sub_folder,"/SublatticeSpin_interacting_eq41_m_5_alpha_18_Nt_",i)
 
 
 for i = 1:length(Nts)[1]

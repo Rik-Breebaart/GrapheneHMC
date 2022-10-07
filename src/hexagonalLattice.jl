@@ -23,7 +23,7 @@ end
 
 # automatically compute the lattice dimension when the struct is created.
 # set a to 0.71*10^(-3) eV-1 which is equvilant to 1.42 Å
-Lattice(Lm,Ln,Nt) = Lattice(Lm,Ln,Nt,0.71*10^(-3))
+Lattice(Lm,Ln,Nt) = Lattice(Lm,Ln,Nt,0.00071)
 # set dimension of the sublatice to Lm*Ln
 Lattice(Lm,Ln,Nt,a) = Lattice(Lm,Ln,Nt,a,Lm*Ln)
 # set the total dimension D = 2*dim_sub*Nt

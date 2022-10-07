@@ -129,7 +129,7 @@ function Δn_time(M, par::Parameters, lat::Lattice)
             end
         end 
     end 
-    return 2*(correlator[:,1,1]-correlator[:,2,2])
+    return 2*(real.(correlator[:,1,1])-real.(correlator[:,2,2]))
 end
 
 

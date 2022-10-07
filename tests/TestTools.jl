@@ -2,6 +2,7 @@
 
 using LinearAlgebra, Test, Tables
 include(abspath(@__DIR__,"../src/hexagonalLattice.jl"))
+include(abspath(@__DIR__,"../src/hybridMonteCarlo.jl"))
 include(abspath(@__DIR__, "../src/tools.jl"))
 
 function TestPermutation(par::Parameters, lat::Lattice)
@@ -52,9 +53,19 @@ function TestFigureFunction(par::Parameters, lat::Lattice)
     CreateFigure(step, ϕ,"plots","testFigure", y_err=error, fmt="o", x_label="x", y_label=L"$\Delta$ niks")
 end
 
+function TestConfigurationStore(par::Parameters, lat::Lattice)
+    HMC_par = HMC_LeapFrog_default(1000)
+    filepath = abspath(@__DIR__,"../tests/trailConfig.csv")
+    Store_Settings(filepath, HMC_par)
+    Store_Settings(filepath, par, method="a")
+    Store_Settings(filepath, lat, method="a")
+    lat_test, par_test, HMC_par_test = Read_Settings(filepath, ["par", "lat", "hmc"])
+    @test par_test == par
+end 
+
 lat = Lattice(2,2,6)
 par = Parameters(2.0, 0.0, 1.0, 0.5)
 TestPermutation(par, lat)
 TestStorage(par, lat)
 TestFigureFunction(par, lat)
-# TestTrace(par ,lat)
+TestConfigurationStore(par, lat)

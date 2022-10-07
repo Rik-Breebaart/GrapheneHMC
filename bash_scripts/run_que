@@ -1,0 +1,7 @@
+#!/bin/bash
+
+for i in 1 2 3 
+do 
+    echo $i
+    qsub -N test_job_$i -S ~/bin/julia -cwd ~/GrapheneHMC/app/graphene_run.jl "test_folder" "test_config.csv" -m ea    
+done

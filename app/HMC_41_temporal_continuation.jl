@@ -20,13 +20,13 @@ par = Parameters(2.0, mass, (300/137)/α, 0.5)
 path_length = 10.0
 step_size = 0.5
 m = 5
-Nsamples= 2000
-burn_in = 0
-offset = floor(Integer, 0.3*Nsamples)
+Nsamples= 10000
+burn_in = 100
+offset = floor(Integer, 0.2*Nsamples)
 
 Nts = [8, 10, 12, 16]
 Δn_array = zeros((length(Nts)[1],2))
-lat = Lattice(4, 4, 1)
+lat = Lattice(6, 6, 1)
 
 folder = storage_folder("Themporal_Continuem", "41", par, lat)
 
@@ -45,7 +45,7 @@ for i = 1:length(Nts)[1]
     ∇S_V(ϕ, χ) = ∇S_V_cg(ϕ, V, par, lat)
     ∇S_M(ϕ, χ) = ∇S_M_eq41_cg(ϕ, χ, M_function(ϕ), par, lat)
     D = lat.D
-    ϕ_init = ones(lat.D)*140
+    ϕ_init = ones(lat.D)*100
 
     configurations, nreject = HybridMonteCarlo(S, ∇S_V, ∇S_M, M_function, D, path_length, step_size, m, 
                                                 Nsamples; rng=rng, position_init=ϕ_init, print_H=true, burn_in=burn_in)
@@ -57,7 +57,7 @@ for i = 1:length(Nts)[1]
     Δn_M = mean(res_Δn[offset:end])
     Δn2_M = mean(res_Δn[offset:end].^2)
     # err_Δn_M = std(res_Δn[offset:end])
-    err_Δn_M = sqrt((Δn2_M-Δn_M^2)/(Nsamples-offset-1))
+    err_Δn_M = sqrt(abs(Δn2_M-Δn_M^2)/(Nsamples-offset-1))
     Δn_array[i,1] = Δn_M
     Δn_array[i,2] = err_Δn_M
     StoreResult(string(sub_folder,"/SublatticeSpin_interacting_eq41_m_",floor(Integer,par.mass*10),"_alpha_",floor(Int,((300/137)/par.ϵ)*10),"_Nt_",lat.Nt), res_Δn)

@@ -16,16 +16,16 @@ include(abspath(@__DIR__, "../src/interactions.jl"))
 include(abspath(@__DIR__, "../src/actionComponents.jl"))
 
 #set configuration settings
-lat = Lattice(4, 4, 12)
-ms = [0.5, 0.4, 0.3, 0.2, 0.1]
-αs = LinRange(0.1, 5.0, 11)
+lat = Lattice(2, 2, 8)
+ms = [0.3, 0.2, 0.1]
+αs = LinRange(0.05, 5.0, 21)
 ϵs = (300/137)./αs
 rng = MersenneTwister(123)
 
 path_length = 10.0
-step_size = 0.6
+step_size = 1.0
 m = 5 #sexton weingarten split Fermionic substeps
-Nsamples= 10000
+Nsamples= 2000
 burn_in = 100
 offset = floor(Integer, Nsamples*0.2)
 
@@ -34,8 +34,8 @@ offset = floor(Integer, Nsamples*0.2)
 
 Δn_array = zeros((length(ms)[1],length(ϵs)[1],2))
 Δn_analytical = zeros((length(ms)[1]))
-folder = storage_folder("SublatticeSpinDifference", "41", β, lat)
-sub_folder = storage_folder(string(folder,"/storage_intermediate"),"41",β,lat)
+folder = storage_folder("SublatticeSpinDifference", "35", β, lat)
+sub_folder = storage_folder(string(folder,"/storage_intermediate"),"35",β,lat)
 ϕ_init = zeros(ComplexF64,lat.D)
 for i in 1:length(ms)[1]
     for j in 1:length(ϵs)[1]
@@ -53,20 +53,20 @@ for i in 1:length(ms)[1]
             par = Parameters(β, ms[i], ϵs[j], 0.5)
             #we will look at equation 35
             V = coulomb_potential(par, lat)
-            M_part = FermionicMatrix_int_41_saved_part(par, lat)
-            M_function(ϕ) = FermionicMatrix_int_41_phi_part(ϕ, M_part, par, lat)
-            # M_function(ϕ) = FermionicMatrix_int_41(ϕ, V, par, lat)
+            M_part = FermionicMatrix_int_35_saved_part(V, par, lat)
+            M_function(ϕ) = FermionicMatrix_int_35_phi_part(ϕ, M_part, par, lat)
+            # M_function(ϕ) = FermionicMatrix_int_35(ϕ, V, par, lat)
             S(ϕ, χ) = Action_V_cg(ϕ, V, par ,lat) + Action_M_cg(χ, M_function(ϕ), par ,lat)
             ∇S_V(ϕ, χ) = ∇S_V_cg(ϕ, V, par, lat)
-            ∇S_M(ϕ, χ) = ∇S_M_eq41_cg(ϕ, χ, M_function(ϕ), par, lat)
+            ∇S_M(ϕ, χ) = ∇S_M_eq35_cg(ϕ, χ, M_function(ϕ), par, lat)
             D = lat.D
 
             configurations, nreject = HybridMonteCarlo(S, ∇S_V, ∇S_M, M_function, D, path_length, step_size, m, Nsamples; rng=rng, position_init=ϕ_init, print_time=true, print_accept=true, burn_in=burn_in)
             ϕ_init = configurations[end,:]
             println((Nsamples-nreject)/Nsamples, " percent for m=",ms[i], " and α=",(300/137)/ϵs[j])
             res_Δn = [Δn(M_function(configurations[i,:]), par, lat) for i in 1:Nsamples]
-            StoreResult(string(sub_folder,"/SublatticeSpin_interacting_eq41_m_",floor(Integer,ms[i]*10),"_alpha_",floor(Int,((300/137)/ϵs[j])*10)), res_Δn)
-            CreateFigure(res_Δn, sub_folder,string("SublatticeSpin_interacting_eq41_m_",floor(Integer,ms[i]*10),"_alpha_",floor(Int,((300/137)/ϵs[j])*10)),x_label="sample", y_label=L"$\Delta n$", fmt="-", figure_title=string(L"$\Delta n$ for m = ",ms[i], L" and $\alpha_{eff}$ = ", (300/137)/ϵs[j]))
+            StoreResult(string(sub_folder,"/SublatticeSpin_interacting_eq35_m_",floor(Integer,ms[i]*10),"_alpha_",floor(Int,((300/137)/ϵs[j])*10)), res_Δn)
+            CreateFigure(res_Δn, sub_folder,string("SublatticeSpin_interacting_eq35_m_",floor(Integer,ms[i]*10),"_alpha_",floor(Int,((300/137)/ϵs[j])*10)),x_label="sample", y_label=L"$\Delta n$", fmt="-", figure_title=string(L"$\Delta n$ for m = ",ms[i], L" and $\alpha_{eff}$ = ", (300/137)/ϵs[j]))
             
             Δn_M = mean(res_Δn[offset:end])
             Δn2_M = mean(res_Δn[offset:end].^2)
@@ -76,8 +76,8 @@ for i in 1:length(ms)[1]
             Δn_array[i,j,2] = err_Δn_M
         end 
     end
-    StoreResult(string(folder,"/SublatticeSpin_interacting_eq41_m_",floor(Integer,ms[i]*10)), Δn_array[i,:,:])
-    CreateFigure(αs, Δn_array[i,:,1], folder,string("SublatticeSpin_interacting_eq41_m_",floor(Integer,ms[i]*10)), 
+    StoreResult(string(folder,"/SublatticeSpin_interacting_eq35_m_",floor(Integer,ms[i]*10)), Δn_array[i,:,:])
+    CreateFigure(αs, Δn_array[i,:,1], folder,string("SublatticeSpin_interacting_eq35_m_",floor(Integer,ms[i]*10)), 
                 y_err = Δn_array[i,:,2] ,x_label=L"$\alpha_{eff}$", y_label=L"$\langle \Delta n \rangle$", 
                 figure_title=string(L"$\Delta n$ for m = ",ms[i]))
     global burn_in=0
@@ -92,7 +92,7 @@ legend(loc="center right", bbox_to_anchor=(1.25, 0.5))
 title(L"$\Delta n$ for varying interactiong strength")
 xlabel(L"$\alpha_{eff}$")
 ylabel(L"$\langle Δn \rangle$")
-savefig(abspath(@__DIR__,string("../results/",folder,"/SublatticeSpin_interacting_eq41.png")))
+savefig(abspath(@__DIR__,string("../results/",folder,"/SublatticeSpin_interacting_eq35.png")))
 
 clf()
 for i in 1:length(ms)[1]
@@ -102,7 +102,7 @@ legend(loc="center right", bbox_to_anchor=(1.25, 0.5))
 title(L"$\Delta n$ for varying interactiong strength")
 xlabel(L"$\alpha_{eff}$")
 ylabel(L"$\langle Δn \rangle$")
-savefig(abspath(@__DIR__,string("../results/",folder,"/SublatticeSpin_interacting_eq41.png")))
+savefig(abspath(@__DIR__,string("../results/",folder,"/SublatticeSpin_interacting_eq35.png")))
 
 m_x = 0.0:0.01:0.6
 
@@ -121,12 +121,12 @@ end
 xlabel("mass")
 ylabel(L"\langle Δn \rangle")
 title("$lat")
-savefig(abspath(@__DIR__,string("../results/",folder,"/SublatticeSpin_interacting_eq41_mass_clutter.png")))
+savefig(abspath(@__DIR__,string("../results/",folder,"/SublatticeSpin_interacting_eq35_mass_clutter.png")))
 
 clf()
 plot(αs, m_0, "o")
 xlabel(L"\alpha")
 ylabel(L"\langle Δn \rangle")
 title("extrapolated E[Δn] for $lat")
-savefig(abspath(@__DIR__,string("../results/",folder,"/SublatticeSpin_interacting_eq41_mass_extrapolation.png")))
+savefig(abspath(@__DIR__,string("../results/",folder,"/SublatticeSpin_interacting_eq35_mass_extrapolation.png")))
 

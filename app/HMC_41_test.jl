@@ -38,13 +38,17 @@ M_function(ϕ) = FermionicMatrix_int_41_phi_part(ϕ, M_part, par, lat)
 
 rng = MersenneTwister(123)
 S(ϕ, χ) = Action_V_cg(ϕ, V, par ,lat) + Action_M_cg(χ, M_function(ϕ), par ,lat)
-∇S(ϕ, χ) = ∇S_V_cg(ϕ, V, par, lat)+∇S_M_eq41_cg(ϕ, χ, M_function(ϕ), par, lat)
+∇S_V(ϕ, χ) = ∇S_V_cg(ϕ, V, par, lat)
+∇S_M(ϕ, χ) = ∇S_M_eq41_cg(ϕ, χ, M_function(ϕ), par, lat)
 D = lat.D
 path_length = 10.0
-step_size = 0.05
-Nsamples= 100
+step_size = 0.5
+Nsamples= 500
+offset = floor(Integer, Nsamples*0.5)
+burn_in = 30
+m = 10
 
-configurations, nreject = HybridMonteCarlo(S::Function, ∇S::Function, M_function::Function, D::Integer, path_length, step_size, Nsamples::Integer; rng=rng, position_init=100 .*ones(lat.D), print_H=true)
+configurations, nreject = HybridMonteCarlo(S, ∇S_V, ∇S_M, M_function, D, path_length, step_size, m, Nsamples::Integer; rng=rng, position_init=100 .*ones(lat.D), print_H=true, burn_in=burn_in)
 @show (Nsamples-nreject)/Nsamples
 
 res_spatial = [greens_function_spatial(M_function(configurations[i,:]), particle_x, particle_y, par, lat) for i in 1:Nsamples]
@@ -62,9 +66,9 @@ plot(res_ϕ_A)
 xlabel("sweeps")
 ylabel(L"$\langle \phi_A \rangle$")
 savefig(abspath(@__DIR__,"../plots/phi_A_hmc_thermilization_41"))
-Δn_M = mean(res_Δn)
-correlator_M = mean(res_spatial)
-correlator_M_momentum = mean(res_momentum)
+Δn_M = mean(res_Δn[offset:end])
+correlator_M = mean(res_spatial[offset:end])
+correlator_M_momentum = mean(res_momentum[offset:end])
 
 name = ["A","B"]
 @show Δn_analytical, Δn_M
