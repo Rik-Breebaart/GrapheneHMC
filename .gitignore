@@ -106,3 +106,4 @@ Manifest.toml
 #do not include error and log files
 *.e*
 *.o*
+*.log*

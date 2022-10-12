@@ -1,0 +1,9 @@
+#!/bin/bash
+for STR in "$@"
+do
+    echo "file $STR";
+    echo "${STR%/*}";
+    echo "${STR##*/}";
+    ~/bin/julia ~/GrapheneHMC/app/graphene_run.jl "${STR%/*}" "${STR##*/}";
+done
+

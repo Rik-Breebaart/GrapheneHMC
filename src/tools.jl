@@ -2,7 +2,7 @@
 using LinearAlgebra, PyPlot, Random, IterativeSolvers, DelimitedFiles, DataFrames, CSV
 include(abspath(@__DIR__, "../src/hybridMonteCarlo.jl"))
 
-struct Parameters
+mutable struct Parameters
     β::Float64
     mass::Float64
     ϵ::Float64
@@ -14,6 +14,10 @@ end
 # the tight binding constant and gaussian system coulomb potential e^2 are fixed
 #κ = 2.8 abd e^2 = 1/137
 Parameters(β, mass, ϵ, R0) = Parameters(β, mass, ϵ, R0, 1.0/137, 2.8) 
+
+function change_mass(mass, par::Parameters)
+    par.mass = mass
+end 
 
 """
 Function to create time permutation matrix which shifts field site index at t to t-1.
@@ -336,9 +340,9 @@ function Store_Settings(File_path, lat::Lattice; method="w")
 end 
 
 function Store_Settings(File_path, par::Parameters; method="w")
-    # store configuration settings in a file inside the desired folder
+    # store configuration settings in a file inside the desired folder 
     df = DataFrame(variable = ["beta", "mass", "epsilon", "R0", "e2" , "kappa"], 
-                   value= [par.β, par.mass, par.ϵ, par.R0, par.e2, par.κ])
+                value= [par.β, par.mass, par.ϵ, par.R0, par.e2, par.κ])
     if method=== "a"
         append=true
     else
