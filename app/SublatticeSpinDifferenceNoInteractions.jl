@@ -12,7 +12,8 @@ include(abspath(@__DIR__, "../src/observables.jl"))
 include(abspath(@__DIR__, "../src/tools.jl"))
 
 
-lat = Lattice(4, 4, 12)
+lat = Lattice(6, 6, 24)
+
 # ms = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0]
 ms = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5]
 
@@ -33,7 +34,7 @@ legend()
 title(L"$\Delta n$ no interactions")
 xlabel("m")
 ylabel("Δn")
-savefig(abspath(@__DIR__,"../plots/SublatticeSpin_no_int.png"))
+savefig(abspath(@__DIR__,string("../plots/SublatticeSpin_no_int_",lat.Lm,"_",lat.Ln,"_",lat.Nt,".png")))
 
 Δn_array = zeros((length(ms)[1],lat.Nt))
 Δn_analytical = zeros((length(ms)[1],lat.Nt))
@@ -53,32 +54,32 @@ for i in 1:length(ms)[1]
     title(L"$\Delta n$ no interactions")
     xlabel("τ")
     ylabel("Δn")
-    savefig(abspath(@__DIR__,"../plots/SublatticeSpin_no_int_time_$i.png"))
+    savefig(abspath(@__DIR__,string("../plots/SublatticeSpin_no_int_",lat.Lm,"_",lat.Ln,"_",lat.Nt,"_time.png")))
 end
 
-Nts = [4, 8, 12, 16, 20, 24]
-Δn_array = zeros(length(ms)[1],length(Nts)[1])
-par_0 = Parameters(2.0, 0.0, 1.0, 0.5)
-for i in 1:length(ms)[1]
-    par = Parameters(par_0.β, ms[i], 1.0, 0.5)
-    for j in 1:length(Nts)[1]
-        change_lat(lat, Nt=Nts[i])
-        M_no_int = FermionicMatrix_no_int(par, lat)
-        Δn_array[i,j] = Δn(M_no_int, par, lat)
-    end 
-end
+# Nts = [4, 8, 12, 16, 20, 24]
+# Δn_array = zeros(length(ms)[1],length(Nts)[1])
+# par_0 = Parameters(2.0, 0.0, 1.0, 0.5)
+# for i in 1:length(ms)[1]
+#     par = Parameters(par_0.β, ms[i], 1.0, 0.5)
+#     for j in 1:length(Nts)[1]
+#         change_lat(lat, Nt=Nts[i])
+#         M_no_int = FermionicMatrix_no_int(par, lat)
+#         Δn_array[i,j] = Δn(M_no_int, par, lat)
+#     end 
+# end
 
-clf()
-Nts_x = 0.0:0.01:((1/4)+0.05)
-for i in 1:length(ms)[1]
-    plot(1 ./Nts, Δn_array[i,:], ".")
-    fit = curve_fit(Polynomial, 1 ./Nts, Δn_array[i,:], 1)
-    y0b = fit.(Nts_x) 
-    plot(Nts_x, y0b, "--", linewidth=1)
-end 
-xlabel("1/Nt")
-ylabel(L"$\langle \Delta n \rangle$")
-title(string(L"$\beta$ = ", par_0.β ,L" $\alpha $= ",0.0))
-xlim([0.0, (1/8)+0.05])
-grid()
-savefig(abspath(@__DIR__,string("../plots/SublatticeSpin_hmc_thermilization_non_interacting_",lat.Lm,"_",lat.Ln,".png")))
+# clf()
+# Nts_x = 0.0:0.01:((1/4)+0.05)
+# for i in 1:length(ms)[1]
+#     plot(1 ./Nts, Δn_array[i,:], ".")
+#     fit = curve_fit(Polynomial, 1 ./Nts, Δn_array[i,:], 1)
+#     y0b = fit.(Nts_x) 
+#     plot(Nts_x, y0b, "--", linewidth=1)
+# end 
+# xlabel("1/Nt")
+# ylabel(L"$\langle \Delta n \rangle$")
+# title(string(L"$\beta$ = ", par_0.β ,L" $\alpha $= ",0.0))
+# xlim([0.0, (1/8)+0.05])
+# grid()
+# savefig(abspath(@__DIR__,string("../plots/SublatticeSpin_hmc_thermilization_non_interacting_",lat.Lm,"_",lat.Ln,"_",lat.Nt,".png")))
