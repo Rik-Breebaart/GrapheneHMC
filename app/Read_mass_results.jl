@@ -10,12 +10,12 @@ include(abspath(@__DIR__, "../src/actionComponents.jl"))
 include(abspath(@__DIR__, "../src/observables.jl"))
 include(abspath(@__DIR__, "../src/tools.jl"))
 
-folder = "SublatticeSpinDifference_2"
+folder = "SublatticeSpinDifference_3"
 conf_folder = "configurations"
 subfolder = "Intermediate_results"
 configurationfile = "run"
 n_mass = 5
-n_alpha = 21
+n_alpha = 11
 file_path_config(i) = abspath(@__DIR__,string("../results/",folder,"/",conf_folder,"/",configurationfile,"_$i.csv"))
 file_folder = string(folder,"/",subfolder)
 lat, HMC_par = Read_Settings(file_path_config(1), ["hmc", "lat"])
@@ -29,13 +29,15 @@ ms = [0.1,0.2,0.3,0.4,0.5]
 for j = 1:length(ms)[1]
     for i = 1:n_alpha
         par = Read_Settings(file_path_config(i), ["par"])
-        res_Δn = ReadResult(Filename(i,ms[j]))    
-        Δn_M = mean(res_Δn[HMC_par.offset:end])
-        Δn2_M = mean(res_Δn[HMC_par.offset:end].^2)
-        # err_Δn_M = std(res_Δn[offset:end])
-        err_Δn_M = sqrt((Δn2_M-Δn_M^2)/(HMC_par.Nsamples-HMC_par.offset-1))
-        Δn_array[j, i, 1] = Δn_M
-        Δn_array[j, i, 2] = err_Δn_M
+        if isfile(abspath(@__DIR__,string("../results/",Filename(i,ms[j]),".txt")))
+            res_Δn = ReadResult(Filename(i,ms[j]))    
+            Δn_M = mean(res_Δn[HMC_par.offset:end])
+            Δn2_M = mean(res_Δn[HMC_par.offset:end].^2)
+            # err_Δn_M = std(res_Δn[offset:end])
+            err_Δn_M = sqrt(abs(Δn2_M-Δn_M^2)/(HMC_par.Nsamples-HMC_par.offset-1))
+            Δn_array[j, i, 1] = Δn_M
+            Δn_array[j, i, 2] = err_Δn_M
+        end
         Δn_array[j, i, 3] = par.ϵ
         Δn_array[j, i, 4] = ms[j]        
     end

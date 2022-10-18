@@ -10,14 +10,13 @@ include(abspath(@__DIR__, "../src/interactions.jl"))
 include(abspath(@__DIR__, "../src/actionComponents.jl"))
 
 #set configuration settings
-lat = Lattice(4, 4, 1)
+lat = Lattice(6, 6, 1)
 Nts = [8, 10, 12, 16, 20]
-folder = string("Continuum_limit_", lat.Lm, "_", lat.Ln)#or use storrage_folder functionx
-
 ms = 0.5
+folder = string("Continuum_limit_", lat.Lm, "_", lat.Ln,"_m_5")#or use storrage_folder functionx
+
 αs = 1.87
 ϵs = (300/137)/αs
-rng = MersenneTwister(123)
 
 filename = "run"
 path_length = 10.0

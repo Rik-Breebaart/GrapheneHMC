@@ -3,5 +3,5 @@
 for ((i=1;i<=$1;i++))
 do 
     echo $i
-    qsub -S bin/bash -N run_test -m ea -cwd run_graphene_script "$2/$3_$i.csv"    
+    qsub -S bin/bash -N run_test -o 'job_output/$JOB_NAME-$JOB_ID.log' -m ea -j y -cwd run_graphene_script "$2/$3_$i.csv"    
 done

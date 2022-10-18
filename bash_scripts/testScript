@@ -1,5 +1,5 @@
 #!/bin/bash
-~/bin/julia ~/GrapheneHMC/tests/TestToolsjl
+~/bin/julia ~/GrapheneHMC/tests/TestTools.jl
 ~/bin/julia ~/GrapheneHMC/tests/TestHexagonalLattice.jl
 ~/bin/julia ~/GrapheneHMC/tests/TestFermionicMatrix.jl
 ~/bin/julia ~/GrapheneHMC/tests/TestAction.jl

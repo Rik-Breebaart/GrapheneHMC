@@ -30,11 +30,11 @@ storage = zeros( (length(ms)[1],2))
 for i in 1:length(ms)[1]
     global ϕ_init
     if i==1
-        ϕ_init = rand(rng,(lat.D)).*10.0
+        ϕ_init = rand(rng,(lat.D)).*5.0
     end
     change_mass(ms[i], par)
 
-    #we will look at equation 35
+    #we will look at equation 41
     V = coulomb_potential(par, lat)
     M_part = FermionicMatrix_int_41_saved_part(par, lat)
     M_function(ϕ) = FermionicMatrix_int_41_phi_part(ϕ, M_part, par, lat)
@@ -73,7 +73,7 @@ y0b = fit.(m_x)
 plot(m_x, y0b, "--", linewidth=1)
 xlabel("mass")
 ylabel(L"\langle \Delta n \rangle")
-title(string(L"Mass extrapolation for $\alpha = $",round(par.ϵ, digits=3), L" $\Delta n(0) $= ",round(fit.(0.0), digits=3)))
+title(string(L"Mass extrapolation for $\alpha = $",round((300/137)./par.ϵ, digits=3), L" $\Delta n(0) $= ",round(fit.(0.0), digits=3)))
 savefig(abspath(@__DIR__,string("../results/",extrapolate_folder,"/SublatticeSpin_interacting_eq41_mass_extrapolation_runlabel_",runlabel,".png")))
 
 

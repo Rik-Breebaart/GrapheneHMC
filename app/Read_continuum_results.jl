@@ -10,11 +10,11 @@ include(abspath(@__DIR__, "../src/actionComponents.jl"))
 include(abspath(@__DIR__, "../src/observables.jl"))
 include(abspath(@__DIR__, "../src/tools.jl"))
 
-folder = "Continuum_limit"
+folder = "Continuum_limit_4_4_m_3"
 conf_folder = "configurations"
 subfolder = "Intermediate_results"
 configurationfile = "run"
-n_Nt = 3
+n_Nt = 5
 file_path_config(i) = abspath(@__DIR__,string("../results/",folder,"/",conf_folder,"/",configurationfile,"_$i.csv"))
 file_folder = string(folder,"/",subfolder)
 par, HMC_par = Read_Settings(file_path_config(1), ["hmc", "par"])
@@ -43,7 +43,8 @@ errorbar(1 ./Δn_array[:,3],Δn_array[:,1], yerr=Δn_array[:,2],fmt="o")
 fit = curve_fit(Polynomial, 1 ./Δn_array[:,3], Δn_array[:,1], 1)
 y0b = fit.(Nts_x) 
 plot(Nts_x, y0b, "--", linewidth=1,)
-title(string(L"$\Delta n$ dependent on temporal spacing, $\Delta n \rightarrow ",round(fit.(0.0),digits=2)))
+grid()
+title(string(L"$\Delta n$ dependent on temporal spacing, $\Delta n \rightarrow $",round(fit.(0.0),digits=2)))
 xlabel(L"$1/Nt$")
 ylabel(L"$\langle Δn \rangle$")
 savefig(abspath(@__DIR__,string("../results/",folder,"/Continuum_extrapolation.png")))

@@ -14,10 +14,10 @@ include(abspath(@__DIR__, "../src/actionComponents.jl"))
 lat = Lattice(2, 2, 16)
 ms = 0.5
 αs = LinRange(0.1, 5.0, 2)
-ϵs = (300/137)./αs
-rng = MersenneTwister(123)
+# ϵs = (300/137)./αs
+ϵs =  LinRange(0.45, 1.0, 12)
 
-folder = "SublatticeSpinDifference_4" #or use storrage_folder function
+folder = "SublatticeSpinDifference_5" #or use storrage_folder function
 conf_folder = "configurations"
 subfolder = "Intermediate_results"
 extrapolate_folder = "extrapolate"
@@ -41,7 +41,7 @@ filename = "run"
 path_length = 10.0
 step_size = 0.5
 m = 5 #sexton weingarten split Fermionic substeps
-Nsamples= 1000
+Nsamples= 20000
 burn_in = 100
 offset = floor(Integer, Nsamples*0.3)
 β = 2.0
