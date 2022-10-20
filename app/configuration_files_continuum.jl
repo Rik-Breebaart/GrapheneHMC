@@ -10,13 +10,15 @@ include(abspath(@__DIR__, "../src/interactions.jl"))
 include(abspath(@__DIR__, "../src/actionComponents.jl"))
 
 #set configuration settings
-lat = Lattice(6, 6, 1)
+lat = Lattice(4, 4, 1)
 Nts = [8, 10, 12, 16, 20]
-ms = 0.5
-folder = string("Continuum_limit_", lat.Lm, "_", lat.Ln,"_m_5")#or use storrage_folder functionx
 
-αs = 1.87
+αs = 0.2
 ϵs = (300/137)/αs
+
+ms = 5.0
+equation = 41
+folder = string("Continuum_limit_", lat.Lm, "_", lat.Ln,"_m_",floor(Integer,ms*10),"_alpha_",floor(Integer,αs*100),"_eq",equation)#or use storrage_folder functionx
 
 filename = "run"
 path_length = 10.0
@@ -24,9 +26,9 @@ step_size = 0.5
 m = 5 #sexton weingarten split Fermionic substeps
 Nsamples= 10000
 burn_in = 100
-offset = floor(Integer, Nsamples*0.3)
+offset = floor(Integer, Nsamples*0.2)
 β = 2.0
-HMC_par = HMC_Parameters(Nsamples, path_length, step_size, offset, m, burn_in)
+HMC_par = HMC_Parameters(Nsamples, path_length, step_size, offset, m, burn_in, equation)
 par = Parameters(β, ms, ϵs, 0.5)
 
 conf_folder = "configurations"

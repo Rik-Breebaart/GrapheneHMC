@@ -12,12 +12,23 @@ include(abspath(@__DIR__, "../src/actionComponents.jl"))
 
 #set configuration settings
 lat = Lattice(2, 2, 16)
-ms = 0.5
-αs = LinRange(0.1, 5.0, 2)
+# αs = LinRange(0.1, 5.0, 2)
+equation = 41
 # ϵs = (300/137)./αs
 ϵs =  LinRange(0.45, 1.0, 12)
 
-folder = "SublatticeSpinDifference_5" #or use storrage_folder function
+filename = "run"
+path_length = 10.0
+step_size = 0.5
+m = 5 #sexton weingarten split Fermionic substeps
+Nsamples= 5000
+burn_in = 100
+offset = floor(Integer, Nsamples*0.3)
+β = 2.0
+HMC_par = HMC_Parameters(Nsamples, path_length, step_size, offset, m, burn_in, equation)
+
+
+folder = string("SublatticeSpinDifference_", lat.Lm, "_", lat.Ln,"_eq",equation,"_2") #or use storrage_folder function
 conf_folder = "configurations"
 subfolder = "Intermediate_results"
 extrapolate_folder = "extrapolate"
@@ -37,18 +48,8 @@ if isdir(sub_folder(extrapolate_folder))==false
     mkdir(sub_folder(extrapolate_folder))
 end
 
-filename = "run"
-path_length = 10.0
-step_size = 0.5
-m = 5 #sexton weingarten split Fermionic substeps
-Nsamples= 20000
-burn_in = 100
-offset = floor(Integer, Nsamples*0.3)
-β = 2.0
-HMC_par = HMC_Parameters(Nsamples, path_length, step_size, offset, m, burn_in)
-
 for i in 1:length(ϵs)[1]
-    par = Parameters(β, ms , ϵs[i], 0.5)
+    par = Parameters(β, 0.0 , ϵs[i], 0.5)
     file_path = abspath(@__DIR__,string("../results/",folder,"/",conf_folder,"/",filename,"_$i.csv"))
     Store_Settings(file_path, HMC_par)
     Store_Settings(file_path, lat, method="a")

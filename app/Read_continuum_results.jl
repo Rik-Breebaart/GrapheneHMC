@@ -9,12 +9,13 @@ include(abspath(@__DIR__, "../src/interactions.jl"))
 include(abspath(@__DIR__, "../src/actionComponents.jl"))
 include(abspath(@__DIR__, "../src/observables.jl"))
 include(abspath(@__DIR__, "../src/tools.jl"))
-
-folder = "Continuum_limit_4_4_m_3"
+ms = 5.0
+equation = 41
+folder = string("Continuum_limit_4_4_m_",floor(Integer,ms*10),"_eq",equation)
 conf_folder = "configurations"
 subfolder = "Intermediate_results"
 configurationfile = "run"
-n_Nt = 5
+n_Nt = 4
 file_path_config(i) = abspath(@__DIR__,string("../results/",folder,"/",conf_folder,"/",configurationfile,"_$i.csv"))
 file_folder = string(folder,"/",subfolder)
 par, HMC_par = Read_Settings(file_path_config(1), ["hmc", "par"])
@@ -23,7 +24,7 @@ par, HMC_par = Read_Settings(file_path_config(1), ["hmc", "par"])
 
 Δn_array = zeros((n_Nt, 3))   # The for things which are stored are: {Δn, err_Δn, ϵ, mass}
 
-Filename(i,Nt) = string(file_folder,"/SublatticeSpin_interacting_eq41_Nt_",Nt,"_runlabel_",i)
+Filename(i,Nt) = string(file_folder,"/SublatticeSpin_interacting_eq",equation,"_Nt_",Nt,"_runlabel_",i)
 
 for i = 1:n_Nt
     lat =  Read_Settings(file_path_config(i), ["lat"])

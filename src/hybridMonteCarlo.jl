@@ -12,6 +12,7 @@ mutable struct HMC_Parameters
     offset::Integer
     m_sw::Integer
     burn_in::Integer
+    equation::Integer
 end 
 
 function HMC_LeapFrog_default(Nsamples)

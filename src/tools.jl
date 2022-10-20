@@ -315,8 +315,8 @@ Input:
 """
 function Store_Settings(File_path, HMC_par::HMC_Parameters; method="w")
     # store configuration settings in a file inside the desired folder
-    df = DataFrame(variable = ["Nsamples", "path_length", "step_size", "offset", "m_sw", "burn_in"], 
-                   value= [HMC_par.Nsamples, HMC_par.path_length, HMC_par.step_size, HMC_par.offset, HMC_par.m_sw, HMC_par.burn_in]
+    df = DataFrame(variable = ["Nsamples", "path_length", "step_size", "offset", "m_sw", "burn_in", "equation"], 
+                   value= [HMC_par.Nsamples, HMC_par.path_length, HMC_par.step_size, HMC_par.offset, HMC_par.m_sw, HMC_par.burn_in, HMC_par.equation]
                    )
     if method=== "a"
         append=true
@@ -384,7 +384,8 @@ function HMC_from_df(df)
                         df[df.variable.=="step_size",:].value[1], 
                         df[df.variable.=="offset",:].value[1],
                         df[df.variable.=="m_sw",:].value[1], 
-                        df[df.variable.=="burn_in",:].value[1])
+                        df[df.variable.=="burn_in",:].value[1],
+                        df[df.variable.=="equation",:].value[1])
         return HMC_par
     else
         return nothing
