@@ -2,6 +2,6 @@
 
 for ((i=1;i<=$1;i++))
 do 
-    echo $i
-    qsub -S bin/bash -N run_mass -o 'job_output/$JOB_NAME-$JOB_ID.log' -m ea -j y -cwd run_graphene_mass_script  $i "$2" "$3_$i.csv"    
+    echo $i  
+    qsub -V -N run_mass_$i -w e -l qname=itf.q -pe openmpi 6 -o 'job_output/$JOB_NAME-$JOB_ID.log' -j y -cwd run_graphene_mass_script $i "$2" "$3_$i.csv"    
 done

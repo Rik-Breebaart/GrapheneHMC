@@ -22,7 +22,7 @@ function HMC_LeapFrog_default(Nsamples)
     else 
         burn_in = 100
     end
-    return HMC_Parameters(Nsamples, 10.0, 0.05, offset, 1, burn_in)
+    return HMC_Parameters(Nsamples, 10.0, 0.05, offset, 1, burn_in, 41)
 end
 
 function HMC_SW_default(Nsamples; step_size=0.5, m_sw = 5, path_length=10.0)
@@ -32,7 +32,7 @@ function HMC_SW_default(Nsamples; step_size=0.5, m_sw = 5, path_length=10.0)
     else 
         burn_in = 100
     end
-    return HMC_Parameters(Nsamples, path_length, step_size, offset, m_sw, burn_in)
+    return HMC_Parameters(Nsamples, path_length, step_size, offset, m_sw, burn_in, 41)
 end
 
 
@@ -326,7 +326,7 @@ Output:
 """
 function HybridMonteCarlo(S::Function, ∇S_V::Function, ∇S_M::Function, M_function::Function, D::Integer, path_length, step_size, m::Integer, 
                         Nsamples::Integer; rng=MersenneTwister(), position_init=1.0, 
-                        print_time=true, print_accept=true, print_H=false, burn_in = 0)
+                        print_time=true, print_accept=true, print_H=false, burn_in = 0, storefolder= "0")
     #set up empty memory for the position and 
     if length(position_init)[1] == 1
         ϕ = (2*rand(rng,D).-1).*position_init
@@ -335,7 +335,11 @@ function HybridMonteCarlo(S::Function, ∇S_V::Function, ∇S_M::Function, M_fun
     else 
         error("incorrect initial position is given")
     end 
+    if storefolder !== "0"
+        StoreResult(storefolder, reshape(ϕ, (1,D)))
+    end
     configurations = zeros(Nsamples,D)
+    configurations[i,:] = ϕ
     randU = rand(rng,Float64,(Nsamples))
     randρ = randn(rng,ComplexF64, (Nsamples,D))
 
@@ -343,7 +347,7 @@ function HybridMonteCarlo(S::Function, ∇S_V::Function, ∇S_M::Function, M_fun
     nreject = 0
     dpdt(π) = π
     #compute Nsamples different configurations
-    for i =1:Nsamples
+    for i =2:Nsamples
         if  print_time==true
             println("start ",i)
             starttime = time()
@@ -392,7 +396,7 @@ function HybridMonteCarlo(S::Function, ∇S_V::Function, ∇S_M::Function, M_fun
             end
         end
         configurations[i,:] = ϕ
-
+        StoreResult(storefolder, reshape(ϕ, (1,D)), append=true)
         if  print_time==true            
             endtime = time()
             println("end! time: ",endtime-starttime)

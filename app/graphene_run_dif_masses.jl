@@ -65,8 +65,8 @@ for i in 1:length(ms)[1]
     S(ϕ, χ) = Action_V_cg(ϕ, V, par ,lat) + Action_M_cg(χ, M_function(ϕ), par ,lat)
     ∇S_V(ϕ, χ) = ∇S_V_cg(ϕ, V, par, lat)
     D = lat.D
-
-    configurations, nreject = HybridMonteCarlo(S, ∇S_V, ∇S_M, M_function, D, HMC_par.path_length, HMC_par.step_size, HMC_par.m_sw, HMC_par.Nsamples; rng=rng, position_init=ϕ_init, print_time=true, print_accept=true, burn_in=HMC_par.burn_in)
+    File_phi = string(subfolder,"/Phi_interacting_eq",HMC_par.equation,"_m_",floor(Integer,par.mass*100),"_runlabel_",runlabel)
+    configurations, nreject = HybridMonteCarlo(S, ∇S_V, ∇S_M, M_function, D, HMC_par.path_length, HMC_par.step_size, HMC_par.m_sw, HMC_par.Nsamples; rng=rng, position_init=ϕ_init, print_time=true, print_accept=true, burn_in=HMC_par.burn_in, storefolder=File_phi)
     ϕ_init = configurations[end,:]
     println((HMC_par.Nsamples-nreject)/HMC_par.Nsamples, " percent for m=",par.mass, " and α=",(300/137)/par.ϵ)
     res_Δn = [Δn(M_function(configurations[i,:]), par, lat) for i in 1:HMC_par.Nsamples]
@@ -83,7 +83,7 @@ for i in 1:length(ms)[1]
     @show err_Δn_M
 end 
 
-m_x = 0.0:0.01:maximum[ms]*(1+0.2)
+m_x = 0.0:0.01:maximum(ms)*(1+0.2)
 
 clf()
 errorbar(ms,

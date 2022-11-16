@@ -22,7 +22,7 @@ filepath = abspath(@__DIR__,string("../results/",folder,"/",ARGS[2]))
 rng = MersenneTwister()
 lat, par, HMC_par = Read_Settings(filepath, ["par", "lat", "hmc"])
 
-ϕ_init = rand(rng,(lat.D)).*10.0
+ϕ_init = rand(rng,(lat.D)).*5.0
 
 #we will look at equation 35
 V = coulomb_potential(par, lat)
@@ -34,6 +34,7 @@ S(ϕ, χ) = Action_V_cg(ϕ, V, par ,lat) + Action_M_cg(χ, M_function(ϕ), par ,
 ∇S_M(ϕ, χ) = ∇S_M_eq41_cg(ϕ, χ, M_function(ϕ), par, lat)
 D = lat.D
 
+File_phi = string(folder,"/Phi_interacting_eq41_m_",floor(Integer,par.mass*10),"_alpha_",floor(Int,((300/137)/par.ϵ)*10))
 configurations, nreject = HybridMonteCarlo(S, ∇S_V, ∇S_M, M_function, D, HMC_par.path_length, HMC_par.step_size, HMC_par.m_sw, HMC_par.Nsamples; rng=rng, position_init=ϕ_init, print_time=true, print_accept=true, burn_in=HMC_par.burn_in)
 println((HMC_par.Nsamples-nreject)/HMC_par.Nsamples, " percent for m=",par.mass, " and α=",(300/137)/par.ϵ)
 res_Δn = [Δn(M_function(configurations[i,:]), par, lat) for i in 1:HMC_par.Nsamples]

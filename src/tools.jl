@@ -177,13 +177,20 @@ Input:
     Filename (string)   The filename and folder to which the result is stored (starting within the results folder)
     result (array)      The array which is stored (can be either 1 or 2 dimensional)    
 """
-function StoreResult(Filename, result)
-    Dim = length(size(result))
-    if Dim>2 
-        error("The storage method is unable to store higher dimensional arrays (3 or more dimensions)")
-    end 
-    writedlm(abspath(@__DIR__,string("../results/",Filename,".txt")), result) 
+function StoreResult(Filename, result; append=false)
+    if append==false
+        Dim = length(size(result))
+        if Dim>2 
+            error("The storage method is unable to store higher dimensional arrays (3 or more dimensions)")
+        end 
+        writedlm(abspath(@__DIR__,string("../results/",Filename,".txt")), result) 
+    else
+        io = open(abspath(@__DIR__,string("../results/",Filename,".txt")), "a")
+        writedlm(io,result)
+        close(io)
+    end        
 end
+
 
 """
 Function to read the stored results from a file.

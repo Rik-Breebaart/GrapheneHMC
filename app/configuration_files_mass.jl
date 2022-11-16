@@ -11,11 +11,13 @@ include(abspath(@__DIR__, "../src/interactions.jl"))
 include(abspath(@__DIR__, "../src/actionComponents.jl"))
 
 #set configuration settings
-lat = Lattice(2, 2, 16)
+lat = Lattice(4, 4, 24)
 # αs = LinRange(0.1, 5.0, 2)
 equation = 41
+# αs = LinRange(0.45, (300/137), 6)
 # ϵs = (300/137)./αs
-ϵs =  LinRange(0.45, 1.0, 12)
+ϵs =  LinRange(1.3, 0.1, 8)
+# ϵs = (300/137)./αs[1:5]
 
 filename = "run"
 path_length = 10.0
@@ -23,12 +25,13 @@ step_size = 0.5
 m = 5 #sexton weingarten split Fermionic substeps
 Nsamples= 5000
 burn_in = 100
-offset = floor(Integer, Nsamples*0.3)
-β = 2.0
+offset = floor(Integer, Nsamples*0.4)
+T = 3/2
+β = 1/T
 HMC_par = HMC_Parameters(Nsamples, path_length, step_size, offset, m, burn_in, equation)
 
 
-folder = string("SublatticeSpinDifference_", lat.Lm, "_", lat.Ln,"_eq",equation,"_2") #or use storrage_folder function
+folder = string("SublatticeSpinDifference_", lat.Lm, "_", lat.Ln,"_Nt_", lat.Nt, "_eq",equation,"_beta_smaller_1") #or use storrage_folder function
 conf_folder = "configurations"
 subfolder = "Intermediate_results"
 extrapolate_folder = "extrapolate"

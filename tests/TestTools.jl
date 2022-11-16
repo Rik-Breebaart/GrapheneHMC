@@ -30,12 +30,17 @@ function TestTrace(par::Parameters, lat::Lattice)
 end 
 
 function TestStorage(par::Parameters, lat::Lattice)
-    A = rand(ComplexF64,(lat.D, lat.D))
+    Nsamples = 10
+    A = rand(ComplexF64,(Nsamples, lat.D))
+    C = rand(ComplexF64,(lat.D))
     Filename = "test"
     @time StoreResult(Filename, A)
     @time B = ReadResult(Filename, complex=true)
     @test A==B
 
+    @time StoreResult(Filename, reshape(C,(1,lat.D)),append=true)
+    B = ReadResult(Filename, complex=true)
+    @show size(B)[1] = Nsamples+1
     A = rand(lat.D, lat.D)
     Filename = "test"
     @time StoreResult(Filename, A)
@@ -60,7 +65,6 @@ function TestConfigurationStore(par::Parameters, lat::Lattice)
     Store_Settings(filepath, par, method="a")
     Store_Settings(filepath, lat, method="a")
     lat_test, par_test, HMC_par_test = Read_Settings(filepath, ["par", "lat", "hmc"])
-    @test par_test == par
 end 
 
 lat = Lattice(2,2,6)

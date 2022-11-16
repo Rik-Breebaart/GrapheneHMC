@@ -21,6 +21,7 @@ folder = ARGS[2]
 filepath = abspath(@__DIR__,string("../results/",folder,"/configurations/",ARGS[3]))
 subfolder = string(folder,"/Intermediate_results")
 Thermalization_folder = string(folder,"/thermalization")
+File_phi = string(subfolder,"/Phi_interacting_eq",HMC_par.equation,"_Nt_",lat.Nt,"_runlabel_",runlabel)
 
 rng = MersenneTwister()
 lat, par, HMC_par = Read_Settings(filepath, ["par", "lat", "hmc"])
@@ -55,7 +56,7 @@ S(ϕ, χ) = Action_V_cg(ϕ, V, par ,lat) + Action_M_cg(χ, M_function(ϕ), par ,
 ∇S_V(ϕ, χ) = ∇S_V_cg(ϕ, V, par, lat)
 D = lat.D
 
-configurations, nreject = HybridMonteCarlo(S, ∇S_V, ∇S_M, M_function, D, HMC_par.path_length, HMC_par.step_size, HMC_par.m_sw, HMC_par.Nsamples; rng=rng, position_init=ϕ_init, print_time=true, print_accept=true, burn_in=HMC_par.burn_in)
+configurations, nreject = HybridMonteCarlo(S, ∇S_V, ∇S_M, M_function, D, HMC_par.path_length, HMC_par.step_size, HMC_par.m_sw, HMC_par.Nsamples; rng=rng, position_init=ϕ_init, print_time=true, print_accept=true, burn_in=HMC_par.burn_in, storefolder= File_phi)
 println((HMC_par.Nsamples-nreject)/HMC_par.Nsamples, " percent for m=",par.mass, " and α=",(300/137)/par.ϵ)
 res_Δn = [Δn(M_function(configurations[i,:]), par, lat) for i in 1:HMC_par.Nsamples]
 
