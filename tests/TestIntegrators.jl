@@ -642,12 +642,12 @@ Test_LeapFrogPQP_plot()
 Test_LeapFrogQPQ_plot()
 
 par = Parameters(2.0, 0.5, 1.0, 0.5)
-lat = Lattice(6, 6, 16)
+lat = Lattice(4, 4, 16)
 path_len = 10.0
 step_size = 0.01
-step_size_sw = 1.0
+step_size_sw = 0.5
 atol = 0.4#(roughly 67% acceptance)
-m=10
+m=5
 # test for potential component of the action 
 println("potential part ")
 @time Test_Graphene_Integration_PotentialComponent(path_len, step_size, par, lat, atol=atol)

@@ -66,9 +66,9 @@ Output:
 """       
 function HybridMonteCarlo(S::Function, ∇S::Function, D::Integer, path_length, step_size, Nsamples::Integer; rng=MersenneTwister(), position_init=1.0, print_time=true, print_accept=true, print_H=false)
     #set up empty memory for the position and 
-    if size(position_init)[1]>1
+    if size(position_init,1)>1
         position = position_init
-    elseif size(position_init)[1] == 1
+    elseif size(position_init,1) == 1
         position = (2*rand(rng,D).-1).*position_init
     else 
         error("incorrect initial position is given")
@@ -298,9 +298,9 @@ function HybridMonteCarlo(S::Function, ∇S::Function, M_function::Function, D::
 end 
 
 """
-Metropolis Hatings monte carlo for graphene
+Metropolis Hastings monte carlo for graphene
 with the fields changed to reflect those in the paper (10.1103/PhysRevB.89.195429)
-The hybrid monte caro performs the following steps:
+The hybrid monte carlo performs the following steps:
 step 0: initialize the system
 step 1: sample the momentum 
 step 2: Perform the hamiltonian monte carlo by using an integrator
@@ -335,11 +335,8 @@ function HybridMonteCarlo(S::Function, ∇S_V::Function, ∇S_M::Function, M_fun
     else 
         error("incorrect initial position is given")
     end 
-    if storefolder !== "0"
-        StoreResult(storefolder, reshape(ϕ, (1,D)))
-    end
     configurations = zeros(Nsamples,D)
-    configurations[i,:] = ϕ
+    configurations[1,:] = ϕ
     randU = rand(rng,Float64,(Nsamples))
     randρ = randn(rng,ComplexF64, (Nsamples,D))
 
@@ -396,12 +393,21 @@ function HybridMonteCarlo(S::Function, ∇S_V::Function, ∇S_M::Function, M_fun
             end
         end
         configurations[i,:] = ϕ
-        StoreResult(storefolder, reshape(ϕ, (1,D)), append=true)
+        if storefolder !== "0"
+            if i==100 
+                StoreResult(storefolder, configurations[1:i,:])
+            elseif mod(i,100)==0
+                StoreResult(storefolder, configurations[(i-99):i,:], append=true)
+            elseif i===Nsamples
+                StoreResult(storefolder, configurations[(i-(99-mod(i,100))):i,:], append=true)
+            end
+        end
         if  print_time==true            
             endtime = time()
             println("end! time: ",endtime-starttime)
         end
     end
+
     # return the final configurations and the number of rejections.
     return configurations, nreject
 end 

@@ -12,44 +12,53 @@ include(abspath(@__DIR__, "../src/observables.jl"))
 include(abspath(@__DIR__, "../src/tools.jl"))
 
 
-lat = Lattice(4, 4, 16)
+lat = Lattice(6, 6, 16)
+lat_analytical = Lattice(lat.Lm, lat.Ln, 512)
 
 # ms = [0.0, 1.0, 2.0, 3.0, 4.0, 5.0]
 ms = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5]
 
 Δn_array = zeros(length(ms)[1])
+meas_array = zeros(length(ms)[1],3)
 Δn_analytical = zeros((length(ms)[1]))
+Δn_analytical_continuum = zeros((length(ms)[1]))
 par_0 = Parameters(2.0, 0.0, 1.0, 0.5)
 for i in 1:length(ms)[1]
     par = Parameters(par_0.β, ms[i], 1.0, 0.5)
     M_no_int = FermionicMatrix_no_int(par, lat)
     Δn_analytical[i] = real.(Δn_no_int(par, lat))
+    Δn_analytical_continuum[i] = real.(Δn_no_int(par, lat_analytical))
     Δn_array[i] = Δn(M_no_int, par, lat)
+    meas = S_33_min_min(M_no_int, par, lat)
+    for j = 1:3
+        meas_array[i,j] = meas[j]
+    end
 end
 m_x = 0.0:0.01:0.6
 
 int_ms = [1,2,3,4,5]
 clf()
-plot(ms, Δn_array, ".", label=L"$\alpha = 0.0$")
 fit = curve_fit(Polynomial, ms[int_ms], Δn_array[int_ms], 2)
 y0b = fit.(m_x) 
-plot(m_x,y0b,"-",label="fit")
-plot(m_x, m_x.*(1/2), label="trial")
-# plot(ms, Δn_analytical, ".", label=L"analytical")
+# plot(m_x,y0b,"-",label="fit")
+plot(ms, Δn_array, ".", label=L"$Fermionic Matrix, \alpha_{eff} = 0.0$")
+# plot(ms, meas_array[:,1], ".", label=L"$S^3_{-}\ \alpha = 0.0$")
+plot(ms, Δn_analytical, ".", label=L"analytical\ discrete")
+plot(ms, Δn_analytical_continuum, ".", label=L"analytical\ continuum")
 legend()
-title(L"$\Delta n$ no interactions")
+title(L"$\langle S^{3}_{-}\rangle$ non-interacting case")
 xlabel("m")
-ylabel("Δn")
+ylabel(L"$\langle S^{3}_{-}\rangle$")
 savefig(abspath(@__DIR__,string("../plots/SublatticeSpin_no_int_",lat.Lm,"_",lat.Ln,"_",lat.Nt,".png")))
 
-Δn_array = zeros((length(ms)[1],lat.Nt))
-Δn_analytical = zeros((length(ms)[1],lat.Nt))
-for i in 1:length(ms)[1]
-    par = Parameters(par_0.β, ms[i], 1.0, 0.5)
-    M_no_int = FermionicMatrix_no_int(par, lat)
-    Δn_analytical[i,:] = real.(Δn_no_int_time(par, lat))
-    Δn_array[i,:] = Δn_time(M_no_int, par, lat)
-end
+# Δn_array = zeros((length(ms)[1],lat.Nt))
+# Δn_analytical = zeros((length(ms)[1],lat.Nt))
+# for i in 1:length(ms)[1]
+#     par = Parameters(par_0.β, ms[i], 1.0, 0.5)
+#     M_no_int = FermionicMatrix_no_int(par, lat)
+#     Δn_analytical[i,:] = real.(Δn_no_int_time(par, lat))
+#     Δn_array[i,:] = Δn_time(M_no_int, par, lat)
+# end
 
 # τ = (0:1:lat.Nt-1).*(par_0.β/lat.Nt)
 # for i in 1:length(ms)[1]

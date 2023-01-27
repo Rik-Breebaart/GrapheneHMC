@@ -21,17 +21,17 @@ end
 
 function Test_potentialPlot(par::Parameters, lat::Lattice)
     folder=abspath(@__DIR__,"../plots")
-    r = distance_matrix(lat)
+    r = distance_matrix(lat)./lat.a
     V_c = coulomb_potential(par, lat)
     V_p = partialScreenedCoulomb_potential(par, lat)
     V_s = shortScreenedCoulomb_potential(par, lat)
     clf()
-    plot(vec(r),vec(V_c), ".",label="Coulomb")
-    plot(vec(r),vec(V_s),"o",label="screened")
-    plot(vec(r),vec(V_p), "*",label="Partial")
+    plot(vec(r),vec(V_c), ".",label="Std. Coulomb")
+    plot(vec(r),vec(V_s),"o",label="ITEP screened ")
+    plot(vec(r),vec(V_p), "*",label="Part. screened")
     legend()
-    xlabel(L"$r_{ij}$")
-    ylabel(L"$V/\epsilon$")
+    xlabel(L"$r_{ij}/a$")
+    ylabel(L"$V(r)$")
     savefig(abspath(folder,"potentials.png"))
 end 
 

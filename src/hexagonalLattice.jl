@@ -46,10 +46,10 @@ function change_lat(lat::Lattice; Nt= 0, Lm=0, Ln=0)
         lat.Lm = Lm
     end 
     if Ln!==0
-        lat.Lm=Lm
+        lat.Ln=Ln
     end 
-    lat.D = lat.dim_sub*lat.Nt*2
     lat.dim_sub = lat.Lm*lat.Ln
+    lat.D = lat.dim_sub*lat.Nt*2
 end 
 
 """
@@ -150,7 +150,6 @@ function index(m,n,Pab,lat;start=0)
     #if no Nt is given the index function for Nt=1 is used.
     return (m-start) + (n-start)*lat.Lm + Pab*(lat.Lm*lat.Ln) + 1
 end
-
 
 """ Function to create neighbour matrix
 

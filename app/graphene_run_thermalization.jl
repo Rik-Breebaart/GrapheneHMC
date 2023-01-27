@@ -21,13 +21,12 @@ folder = ARGS[2]
 filepath = abspath(@__DIR__,string("../results/",folder,"/configurations/",ARGS[3]))
 subfolder = string(folder,"/Intermediate_results")
 Thermalization_folder = string(folder,"/thermalization")
-File_phi = string(subfolder,"/Phi_interacting_eq",HMC_par.equation,"_Nt_",lat.Nt,"_runlabel_",runlabel)
 
 rng = MersenneTwister()
 lat, par, HMC_par = Read_Settings(filepath, ["par", "lat", "hmc"])
+File_phi = string(subfolder,"/Phi_interacting_eq",HMC_par.equation,"_Nt_",lat.Nt,"_runlabel_",runlabel)
 
 ϕ_init = ones(ComplexF64,lat.D).*100.0
-
 
 V = partialScreenedCoulomb_potential(par, lat)
 if HMC_par.equation == 41

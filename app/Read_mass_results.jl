@@ -10,13 +10,13 @@ include(abspath(@__DIR__, "../src/actionComponents.jl"))
 include(abspath(@__DIR__, "../src/observables.jl"))
 include(abspath(@__DIR__, "../src/tools.jl"))
 equation = 41
-folder = string("SublatticeSpinDifference_4_4_eq",equation,"_beta_smaller_1")
+folder = string("SublatticeSpinDifference_4_4_Nt_16_eq",equation,"_final")
 conf_folder = "configurations"
 subfolder = "Intermediate_results"
 configurationfile = "run"
 extrapolate_folder = string(folder,"/extrapolate")
 n_mass = 5
-n_alpha = 8
+n_alpha = 10
 file_path_config(i) = abspath(@__DIR__,string("../results/",folder,"/",conf_folder,"/",configurationfile,"_$i.csv"))
 file_folder = string(folder,"/",subfolder)
 lat, HMC_par = Read_Settings(file_path_config(1), ["hmc", "lat"])
@@ -64,7 +64,7 @@ savefig(abspath(@__DIR__,string("../results/",folder,"/SublatticeSpin_interactin
 
 m_x = 0.0:0.01:0.6
 
-int_ms = [1,3,4,5]
+int_ms = [1,2,3,4,5]
 plot_extrapolate = true
 m_0 = zeros(Float64,size(αs)[1])
 for i = 1:size(αs)[1]
@@ -87,9 +87,7 @@ end
 
 clf()
 plot(αs, m_0, "o")
-xlabel(L"$\alpha_eff$")
+xlabel(L"$\alpha_{eff}$")
 ylabel(L"$\langle \Delta n \rangle$")
 title(string(L"extrapolated $\langle \Delta n\rangle$ for ",lat,L"$\beta$ = ",round(Δn_array[1, 1, 5],digits=3)))
 savefig(abspath(@__DIR__,string("../results/",folder,"/SublatticeSpin_interacting_eq41_mass_extrapolation.png")))
-
-

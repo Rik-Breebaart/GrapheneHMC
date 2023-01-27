@@ -101,6 +101,86 @@ function Δn(M, par::Parameters, lat::Lattice)
     return (2/(lat.Nt*lat.dim_sub))*real(sum(diag(invM)))
 end
 
+"""
+The squared sublattice spin difference of the graphene sublattices.
+
+
+Input:
+    M   (Matrix lat.D x lat.D)      The fermionic matrix of the system 
+    par (Paramaters struct)         Paramaters struct containing the run paramaters (α, β etc.)
+    lat (Lattice struct)            Lattice struct containing the lattice paramaters (Lm, LN, Nt, a, dim_sub, D) 
+Output:
+    Δn  (Float)                     The spin sublattice difference 
+"""
+function S_33_min_min(M, par::Parameters, lat::Lattice)
+    P = time_permutation_Matrix_anti_pbc(lat)
+    # δ_{t-1, t'}δ_{x,y}m_x 
+    # with m_x = 1 if x in either A or B.
+    S_P_plus = kron(Diagonal([1,1]),kron(P,Diagonal(ones(lat.dim_sub))))
+    # with m_x = 1 if x in A and -1 if x in B.
+    S_P_min = kron(Diagonal([1,-1]),kron(P,Diagonal(ones(lat.dim_sub))))
+    invM = inv(M)
+    AFinvM = S_P_min*invM
+    FinvM = S_P_plus*invM
+    
+    # \sum_{x,y} 2 Re[ (A_y M^{-1}_{(y,t)(y,t+1)})(A_x M^{-1}_{(x,t)(x,t+1)})]
+    full_s33_min_min = 0 
+    full_s3_min = 0
+    full_s3_plus = 0
+    # performing the sum over time at equal time. 
+    O1 = 0
+    O2 = 0
+    O3 = 0
+    O4 = 0
+    O5 = 0
+    O6 = 0
+    O11 = 0
+    O12 = 0
+    O13 = 0
+    O14 = 0 
+    for t=1:lat.Nt 
+        trace_AB = zeros(Complex, 2)
+        mixed_term = zeros(Complex, (2,2))
+        for Pab_x = [0,1]
+            for m_x =1:lat.Lm, n_x = 1:lat.Ln
+                #performing the traces in the anti-feromagnetic and feromagnetic version. Already set at the linear time used for the coherent states.
+                trace_AB[Pab_x+1] += FinvM[index(m_x, n_x, t, Pab_x, lat, start=1),index(m_x, n_x, t, Pab_x, lat, start=1)]
+                for Pab_y = [0,1]
+                    for m_y =1:lat.Lm, n_y = 1:lat.Ln
+                         mixed_term[Pab_x+1, Pab_y+1] += FinvM[index(m_x, n_x, t, Pab_x, lat, start=1),index(m_y, n_y, t, Pab_y, lat, start=1)]*FinvM[index(m_y, n_y, t, Pab_y, lat, start=1),index(m_x, n_x, t, Pab_x, lat, start=1)]
+                    end 
+                end               
+            end 
+        end 
+        # @show trace_AB
+        # @show mixed_term
+        # performing the sum over time at equal time. 
+        O1 += real(trace_AB[1])
+        O2 += real(trace_AB[2])
+        O3 += abs(trace_AB[1])^2
+        O4 += abs(trace_AB[2])^2
+        O5 += real(trace_AB[1]*conj(trace_AB[2]))
+        O6 += real(conj(trace_AB[1])*trace_AB[2])
+        O11 += real(trace_AB[1]) + real(trace_AB[1])^2 - real(mixed_term[1,1])
+        O12 += real(trace_AB[2]) + real(trace_AB[2])^2 - real(mixed_term[2,2])
+        O13 += real(trace_AB[1]*trace_AB[2])- real(mixed_term[1,2])
+        O14 += real(trace_AB[1]*trace_AB[2])- real(mixed_term[2,1])
+    end 
+    # @show O1/(lat.Nt)
+    # @show O2/(lat.Nt)
+    # @show O3/(lat.Nt)
+    # @show O4/(lat.Nt)
+    # @show O5/(lat.Nt)
+    # @show O6/(lat.Nt)
+    # @show O11/(lat.Nt)
+    # @show O12/(lat.Nt)
+    # @show O13/(lat.Nt)
+    # @show O14/(lat.Nt)
+    full_s33_min_min = O3 + O4 - O5 - O6 + O11 + O12 - O13 - O14
+    full_s3_min = O1 - O2
+    full_s3_plus = O1 + O2
+    return 2*full_s3_min/(lat.Nt*lat.dim_sub), full_s33_min_min/(2*lat.Nt*lat.dim_sub), 1 - full_s3_plus/(lat.Nt*lat.dim_sub)
+end 
 
 """
 The sublattice spin difference of the graphene sublattices as a functiuno of time.

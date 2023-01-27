@@ -1,0 +1,2 @@
+#!/bin/bash
+~/bin/julia ~/GrapheneHMC/app/read_observable.jl;

@@ -40,7 +40,7 @@ function TestStorage(par::Parameters, lat::Lattice)
 
     @time StoreResult(Filename, reshape(C,(1,lat.D)),append=true)
     B = ReadResult(Filename, complex=true)
-    @show size(B)[1] = Nsamples+1
+    @test size(B,1) == Nsamples+1
     A = rand(lat.D, lat.D)
     Filename = "test"
     @time StoreResult(Filename, A)

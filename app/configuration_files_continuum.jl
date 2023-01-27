@@ -10,10 +10,10 @@ include(abspath(@__DIR__, "../src/interactions.jl"))
 include(abspath(@__DIR__, "../src/actionComponents.jl"))
 
 #set configuration settings
-lat = Lattice(6, 6, 1)
-Nts = [8, 12, 16]
+lat = Lattice(2, 2, 1)
+Nts = [4, 8, 12, 16]
 
-αs = 4.00
+αs = 2.00
 ϵs = (300/137)/αs
 
 ms = 0.5
@@ -24,7 +24,7 @@ filename = "run"
 path_length = 10.0
 step_size = 0.5
 m = 5 #sexton weingarten split Fermionic substeps
-Nsamples= 5000
+Nsamples= 1000
 burn_in = 100
 offset = floor(Integer, Nsamples*0.4)
 β = 2.0

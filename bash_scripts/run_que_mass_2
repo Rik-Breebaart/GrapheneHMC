@@ -1,0 +1,8 @@
+#!/bin/bash
+
+for ((i=1;i<=$1;i++))
+do 
+    echo $i
+    echo $4
+    qsub -S bin/bash -N run_mass -o 'job_output/$JOB_NAME-$JOB_ID.log' -m ea -j y -cwd run_graphene_mass_2_script  $i "$2" "$3_$i.csv" $4     
+done
